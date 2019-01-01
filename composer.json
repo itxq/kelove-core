@@ -10,20 +10,22 @@
         }
     ],
     "require"    : {
-        "php"                 : ">=5.6.0",
+        "php"                 : ">=7.1.0",
         "ext-pdo"             : ">=1.0.0",
         "ext-zlib"            : ">=1.2",
         "ext-curl"            : ">=7",
         "ext-json"            : ">=1.2",
         "ext-gd"              : ">=2.0.0",
+        "ext-iconv"           : ">=1.0",
+        "topthink/framework"  : "5.2.*-dev",
         "topthink/think-image": ">=1.0"
     },
     "autoload"   : {
         "psr-4": {
-            "itxq\\kelove\\": "src"
+            "kelove\\": "kelove"
         },
         "files": [
-            "src/helper.php"
+            "kelove/kelove.php"
         ]
     }
 }

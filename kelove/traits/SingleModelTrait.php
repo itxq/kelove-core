@@ -1,31 +1,21 @@
 <?php
 /**
  *  ==================================================================
- *        文 件 名: SingleModel.php
- *        概    要: 单例设计模式基类
+ *        文 件 名: SingleModelTrait.php
+ *        概    要: 单例设计
  *        作    者: IT小强
- *        创建时间: 2018-11-09 14:59
+ *        创建时间: 2018-12-25 13:48:57
  *        修改时间:
  *        copyright (c) 2016 - 2018 mail@xqitw.cn
  *  ==================================================================
  */
 
-namespace itxq\kelove;
+namespace kelove\traits;
 
 /**
- * 单例设计模式
- * Class SingleModel
- * @package itxq\kelove
- */
-abstract class SingleModel
-{
-    use SingleModelTrait;
-}
-
-/**
- * 单例设计模式 Trait
+ * 单例设计
  * Trait SingleModelTrait
- * @package itxq\kelove
+ * @package kelove\traits
  */
 trait SingleModelTrait
 {
@@ -40,16 +30,24 @@ trait SingleModelTrait
     protected $config = [];
     
     /**
-     * @var string|array - 反馈信息
+     * @var mixed - 反馈信息
      */
     protected $message = '';
     
     /**
      * SingleModelTrait 构造函数. 禁止直接实例化该类
-     * @param array|mixed $config - 配置信息
+     * @param array $config - 配置信息
      */
-    protected function __construct($config = []) {
+    protected function __construct(array $config = []) {
         $this->config = array_merge($this->config, $config);
+        $this->initialize($this->config);
+    }
+    
+    /**
+     * 初始化加载
+     * @param array $config - 配置信息
+     */
+    protected function initialize(array $config = []): void {
     }
     
     /**
@@ -58,7 +56,7 @@ trait SingleModelTrait
      * @param bool $force - 是否强制重新实例化
      * @return static
      */
-    public static function ins($config = [], $force = false) {
+    public static function make(array $config = [], bool $force = false) {
         $className = get_called_class();
         if (!isset(self::$instances[$className]) || !self::$instances[$className] instanceof $className || $force === true) {
             $instance = new $className($config);
@@ -69,7 +67,7 @@ trait SingleModelTrait
     
     /**
      * 获取反馈信息
-     * @return string|array
+     * @return mixed
      */
     public function getMessage() {
         return $this->message;
@@ -77,8 +75,9 @@ trait SingleModelTrait
     
     /**
      * 克隆防止继承
+     * @return bool
      */
     final private function __clone() {
-        // fixme  禁止克隆
+        return false;
     }
 }

@@ -4,51 +4,49 @@
  *        文 件 名: File.php
  *        概    要: 文件目录操作类
  *        作    者: IT小强
- *        创建时间: 2018-11-09 15:20
+ *        创建时间: 2018-12-29 11:39:49
  *        修改时间:
  *        copyright (c) 2016 - 2018 mail@xqitw.cn
  *  ==================================================================
  */
 
-namespace itxq\kelove\core;
+namespace kelove\util;
 
-use itxq\kelove\SingleModel;
+use kelove\traits\SingleModelTrait;
 
 /**
  * 文件目录操作类
  * Class File
- * @package itxq\kelove\core
+ * @package kelove\util
  */
-class File extends SingleModel
+class File
 {
+    use SingleModelTrait;
+    
     /**
      * 创建目录
      * @param $dir -目录名
      * @return boolean true 成功， false 失败
      */
-    public function mkDir($dir) {
+    public function mkDir(string $dir): bool {
         $dir = rtrim($dir, '/') . '/';
-        if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true)) {
-                $this->message = '创建目录失败，请检查权限！';
-                return false;
-            }
+        if (is_dir($dir)) {
             return true;
         }
-        return true;
+        return mkdir($dir, 0777, true);
     }
     
     /**
      * 写文件
-     * @param $filename - 文件名
-     * @param $content - 文件内容
-     * @param $openMod - 打开方式
-     * @return boolean true 成功, false 失败
+     * @param string $filename - 文件名
+     * @param string $writeText - 文件内容
+     * @param string $openMod - 打开方式
+     * @return bool - true 成功false 失败
      */
-    public function writeFile($filename, $content, $openMod = 'w') {
+    public function writeFile($filename, $writeText, $openMod = 'w'): bool {
         if (@$fp = fopen($filename, $openMod)) {
             flock($fp, 2);
-            fwrite($fp, $content);
+            fwrite($fp, $writeText);
             fclose($fp);
             return true;
         } else {
@@ -58,10 +56,10 @@ class File extends SingleModel
     
     /**
      * 删除目录
-     * @param $dirName -原目录
+     * @param string $dirName -原目录
      * @return boolean true 成功, false 失败
      */
-    public function delDir($dirName) {
+    public function delDir(string $dirName): bool {
         if (!file_exists($dirName)) {
             return false;
         }
@@ -73,7 +71,7 @@ class File extends SingleModel
                 if (is_dir($file)) {
                     $this->delDir($file);
                 } else {
-                    @unlink($file);
+                    unlink($file);
                 }
             }
         }
@@ -83,11 +81,11 @@ class File extends SingleModel
     
     /**
      * 复制目录
-     * @param $surDir - 原目录
-     * @param $toDir - 目标目录
+     * @param string $surDir - 原目录
+     * @param string $toDir - 目标目录
      * @return boolean true 成功, false 失败
      */
-    public function copyDir($surDir, $toDir) {
+    public function copyDir(string $surDir, string $toDir): bool {
         $surDir = rtrim($surDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
         if (!file_exists($surDir)) {
@@ -115,11 +113,11 @@ class File extends SingleModel
     
     /**
      * 列出目录
-     * @param $dir -目录名
-     * @param $isDel -是否删除当前目录和上级目录（. or ..）
+     * @param string $dir -目录名
+     * @param bool $isDel - 是否删除当前目录和上级目录（. or ..）
      * @return array - 目录数组。列出文件夹下内容，返回数组 $dirArray['dir']:存文件夹；$dirArray['file']：存文件
      */
-    public function getDirs($dir, $isDel = true) {
+    public function getDirs(string $dir, bool $isDel = true): array {
         $dir = rtrim($dir, '/') . '/';
         $dirArray = [];
         if (false != ($handle = opendir($dir))) {
@@ -148,16 +146,16 @@ class File extends SingleModel
     
     /**
      * 递归获取指定目录下的所有文件
-     * @param $dir - 指定目录路径
+     * @param string $dir - 指定目录路径
      * @param bool $isList - 是否返回一维数组（默认否，即返回多维数组）
      * @param array $list - 无需赋值
-     * @return array|mixed
+     * @return array
      */
-    public function getFiles($dir, $isList = false, $list = []) {
+    public function getFiles(string $dir, bool $isList = false, array $list = []): array {
         $data = [];
         $dir = realpath($dir);
         if (!is_dir($dir)) {
-            return false;
+            return [];
         }
         $dh = opendir($dir);//打开目录
         while (($d = readdir($dh)) !== false) {
@@ -180,18 +178,18 @@ class File extends SingleModel
     
     /**
      * 统计文件夹大小
-     * @param $dir - 目录名
+     * @param string $dir - 目录名
      * @return number 文件夹大小(单位 B)
      */
-    public function getSize($dir) {
+    public function getSize(string $dir) {
         $dirList = opendir($dir);
         $dirSize = 0;
-        while (false !== ($folderorfile = readdir($dirList))) {
-            if ($folderorfile != "." && $folderorfile != "..") {
-                if (is_dir("$dir/$folderorfile")) {
-                    $dirSize += $this->getSize("$dir/$folderorfile");
+        while (false !== ($folderOrFile = readdir($dirList))) {
+            if ($folderOrFile != '.' && $folderOrFile != '..') {
+                if (is_dir("$dir/$folderOrFile")) {
+                    $dirSize += $this->getSize("$dir/$folderOrFile");
                 } else {
-                    $dirSize += filesize("$dir/$folderorfile");
+                    $dirSize += filesize("$dir/$folderOrFile");
                 }
             }
         }
@@ -201,22 +199,22 @@ class File extends SingleModel
     
     /**
      * 检测是否为空文件夹
-     * @param $dir - 目录名
+     * @param string $dir - 目录名
      * @return boolean - true 空， false 不为空
      */
-    public function emptyDir($dir) {
+    public function emptyDir(string $dir): bool {
         return (($files = @scandir($dir)) && count($files) <= 2);
     }
     
     /**
      * 解压zip格式的压缩文件
-     * @param $zipFile - zip文件路径
+     * @param string $zipFile - zip文件路径
      * @param string $unzipDir - 解压路径
      * @param bool $mkNameDir - 是否以压缩文件名命起始目录
      * @param bool $overWrite - 是否覆盖已有文件(true-覆盖|false-不覆盖|string-以该字符串命名目录)
      * @return bool
      */
-    public function unzip($zipFile, $unzipDir = './', $mkNameDir = false, $overWrite = false) {
+    public function unzip(string $zipFile, string $unzipDir = './', bool $mkNameDir = false, bool $overWrite = false): bool {
         // 获取压缩文件全路径
         $zipFile = realpath($zipFile);
         if (!is_file($zipFile)) {

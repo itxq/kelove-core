@@ -11,15 +11,15 @@
     ],
     "require"    : {
         "php"                 : ">=7.1.0",
-        "ext-pdo"             : ">=1.0.0",
-        "ext-zlib"            : ">=1.2",
-        "ext-curl"            : ">=7",
-        "ext-json"            : ">=1.2",
-        "ext-gd"              : ">=2.0.0",
-        "ext-iconv"           : ">=1.0",
+        "ext-pdo"             : "*",
+        "ext-zlib"            : "*",
+        "ext-curl"            : "*",
+        "ext-json"            : "*",
+        "ext-gd"              : "*",
+        "ext-iconv"           : "*",
         "topthink/framework"  : "5.2.*-dev",
-        "topthink/think-image": ">=1.0",
-        "guzzlehttp/guzzle"   : "^6.3"
+        "guzzlehttp/guzzle"   : "^6.3",
+        "topthink/think-image": "^1.0"
     },
     "autoload"   : {
         "psr-4": {

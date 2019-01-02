@@ -113,6 +113,10 @@ class App extends \think\App
             $this->configPath = str_replace($this->rootPath . 'config', realpath($this->rootConfigPath), $this->configPath);
             $this->env->set(['config_path' => $this->configPath]);
         }
+        $this->env->set([
+            'extend_path' => ROOT_PATH . 'extend' . DIRECTORY_SEPARATOR,
+            'vendor_path' => ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR,
+        ]);
     }
     
     /**

@@ -40,7 +40,6 @@ class Run
      * @param string $name 应用名称
      * @param string $namespace 应用命名空间
      * @param string $path 应用路径
-     * @throws \think\Exception
      */
     public function appRun(bool $debug = false, string $name = '', string $namespace = '', string $path = ''): void {
         $app = new App(KELOVE_PATH);

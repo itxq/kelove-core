@@ -394,6 +394,18 @@ class DB
     }
     
     /**
+     * 获取数据库中所有表名
+     * @return array
+     */
+    public function getTables() {
+        try {
+            return $this->db->query('show tables');
+        } catch (\PDOException $exception) {
+            return [];
+        }
+    }
+    
+    /**
      * 析构方法，用于关闭文件资源
      */
     public function __destruct() {

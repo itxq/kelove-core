@@ -113,9 +113,13 @@ class App extends \think\App
             $this->configPath = str_replace($this->rootPath . 'config', realpath($this->rootConfigPath), $this->configPath);
             $this->env->set(['config_path' => $this->configPath]);
         }
+        // 获取根目录
+        $baseRoot = $this->getBaseRoot();
         $this->env->set([
-            'extend_path' => ROOT_PATH . 'extend' . DIRECTORY_SEPARATOR,
-            'vendor_path' => ROOT_PATH . 'vendor' . DIRECTORY_SEPARATOR,
+            'base_root'   => $baseRoot,
+            'extend_path' => $baseRoot . 'extend' . DIRECTORY_SEPARATOR,
+            'vendor_path' => $baseRoot . 'vendor' . DIRECTORY_SEPARATOR,
+            'kelove_path' => realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR,
         ]);
     }
     
@@ -139,8 +143,22 @@ class App extends \think\App
             return realpath($path) . DIRECTORY_SEPARATOR;
         }
         if (!mkdir($path, 0777, true)) {
-            return false;
+            $path = $this->getBaseRoot() . $path;
+            if (!mkdir($path, 0777, true)) {
+                return false;
+            }
         }
         return realpath($path) . DIRECTORY_SEPARATOR;
+    }
+    
+    /**
+     * 获取根目录
+     * @return string
+     */
+    protected function getBaseRoot() {
+        $scriptName = realpath($this->scriptName);
+        $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $this->request->baseFile());
+        $baseRoot = preg_replace('/^(.*?)(' . addslashes($baseFile) . ')$/', "\\1", $scriptName) . DIRECTORY_SEPARATOR;
+        return $baseRoot;
     }
 }

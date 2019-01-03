@@ -13,6 +13,7 @@
 namespace kelove\traits;
 
 use kelove\util\File;
+use think\facade\Env;
 
 /**
  * 模板相关处理
@@ -31,7 +32,7 @@ trait TemplateTrait
     protected function getTemplate(string $name = '', string $path = '', string $suffix = ''): array {
         $name = empty($name) ? 'default' : $name;
         $suffix = empty($suffix) ? '.' . config('url_html_suffix') : $suffix;
-        $path = empty($path) ? KELOVE_PATH . 'template' . DIRECTORY_SEPARATOR : realpath($path);
+        $path = empty($path) ? Env::get('base_root') . 'template' . DIRECTORY_SEPARATOR : realpath($path);
         $pre = $path . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
         $template = File::make()->getFiles($pre, true);
         $pattern = '/^(' . addslashes($pre) . ')(.*?)(\\' . addslashes($suffix) . ')$/';

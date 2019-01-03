@@ -14,17 +14,6 @@ namespace kelove\core;
 
 use kelove\traits\SingleModelTrait;
 
-// KELOVE核心目录
-define('KELOVE_PATH', realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR);
-
-// 根目录
-if (!defined('ROOT_PATH')) {
-    define('ROOT_PATH', realpath(__DIR__ . '/../../') . DIRECTORY_SEPARATOR);
-}
-
-// 存储目录
-define('STORAGE_PATH', ROOT_PATH . 'storage' . DIRECTORY_SEPARATOR);
-
 /**
  * 初始化应用
  * Class Run
@@ -35,6 +24,19 @@ class Run
     use SingleModelTrait;
     
     /**
+     * @var string 核心目录
+     */
+    protected $kelovePath = '';
+    
+    /**
+     * 初始化加载
+     * @param array $config - 配置信息
+     */
+    protected function initialize(array $config = []): void {
+        $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
+    }
+    
+    /**
      * 初始化应用
      * @param bool $debug 是否开启调试
      * @param string $name 应用名称
@@ -42,10 +44,10 @@ class Run
      * @param string $path 应用路径
      */
     public function appRun(bool $debug = false, string $name = '', string $namespace = '', string $path = ''): void {
-        $app = new App(KELOVE_PATH);
+        $app = new App($this->kelovePath);
         $app->debug($debug)
-            ->setBasePath(KELOVE_PATH)
-            ->setRootRuntimePath(STORAGE_PATH . 'runtime' . DIRECTORY_SEPARATOR)
+            ->setBasePath($this->kelovePath)
+            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
             ->name($name)
             ->setNamespace($namespace)
             ->path($path)

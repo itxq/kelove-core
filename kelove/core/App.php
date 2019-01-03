@@ -143,6 +143,9 @@ class App extends \think\App
             return realpath($path) . DIRECTORY_SEPARATOR;
         }
         $path = $this->getBaseRoot() . $path;
+        if (is_dir($path)) {
+            return realpath($path) . DIRECTORY_SEPARATOR;
+        }
         if (!mkdir($path, 0777, true)) {
             return false;
         }

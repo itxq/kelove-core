@@ -95,9 +95,10 @@ class App extends \think\App
     /**
      * 设置自定义依赖相关路径
      * @access protected
+     * @param string $baseRoot
      * @return void
      */
-    protected function setCustomDependPath(): void {
+    protected function setCustomDependPath(string $baseRoot): void {
         // 自定义运行目录
         if (!empty($this->rootRuntimePath)) {
             $this->runtimePath = str_replace($this->rootPath . 'runtime', realpath($this->rootRuntimePath), $this->runtimePath);
@@ -113,8 +114,7 @@ class App extends \think\App
             $this->configPath = str_replace($this->rootPath . 'config', realpath($this->rootConfigPath), $this->configPath);
             $this->env->set(['config_path' => $this->configPath]);
         }
-        // 获取根目录
-        $baseRoot = $this->getBaseRoot();
+        
         $this->env->set([
             'base_root'   => $baseRoot,
             'extend_path' => $baseRoot . 'extend' . DIRECTORY_SEPARATOR,
@@ -129,8 +129,13 @@ class App extends \think\App
      * @return void
      */
     protected function setDependPath(): void {
+        // 获取根目录
+        $baseRoot = $this->getBaseRoot();
+        if (!$this->appPath) {
+            $this->appPath = $baseRoot . 'app' . ($this->multi ? DIRECTORY_SEPARATOR . $this->name : '') . DIRECTORY_SEPARATOR;
+        }
         parent::setDependPath();
-        $this->setCustomDependPath();
+        $this->setCustomDependPath($baseRoot);
     }
     
     /**

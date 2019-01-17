@@ -25,6 +25,8 @@
         "psr-4": {
             "kelove\\": "kelove"
         },
-        "files": []
+        "files": [
+            "kelove/helper.php"
+        ]
     }
 }

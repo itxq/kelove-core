@@ -18,8 +18,8 @@ if (!function_exists('sort_by_key')) {
      * @param string $type - 排序类型【SORT_ASC|SORT_DESC】
      * @return array - 返回排序之后的数组
      */
-    function sort_by_key($array, $keyName, $type = 'SORT_DESC') {
-        if (!is_array($array) || count($array) < 1) {
+    function sort_by_key(array $array, string $keyName, string $type = 'SORT_DESC'): array {
+        if (count($array) < 1) {
             return [];
         }
         $arrSort = [];
@@ -37,12 +37,12 @@ if (!function_exists('byte_format')) {
     
     /**
      * 格式化字节大小
-     * @param $bytes - 字节数
+     * @param int $bytes - 字节数
      * @param string $unit - 转换单位
      * @param int $decimals - 保留小数位数
      * @return string
      */
-    function byte_format($bytes, $unit = '', $decimals = 2) {
+    function byte_format(int $bytes, string $unit = '', int $decimals = 2): string {
         $units = ['B' => 0, 'KB' => 1, 'MB' => 2, 'GB' => 3, 'TB' => 4, 'PB' => 5, 'EB' => 6, 'ZB' => 7, 'YB' => 8];
         $value = 0;
         if ($bytes > 0) {
@@ -86,7 +86,7 @@ if (!function_exists('rgb_to_hex')) {
      * @param $rgb - RGB颜色的字符串 如：rgb(255,255,255);
      * @return string 十六进制颜色值 如：#FFFFFF
      */
-    function rgb_to_hex($rgb) {
+    function rgb_to_hex(string $rgb): string {
         $regexp = "/^rgb\(([0-9]{0,3})\,\s*([0-9]{0,3})\,\s*([0-9]{0,3})\)/";
         preg_match($regexp, $rgb, $match);
         array_shift($match);
@@ -114,11 +114,11 @@ if (!function_exists('rgb_to_hex')) {
 if (!function_exists('hex_to_rgb')) {
     /**
      * 十六进制 转 RGB
-     * @param $hexColor - 十六进制颜色 如：#FFF000;
-     * @param $isString - 是否返回字符串格式
+     * @param string $hexColor - 十六进制颜色 如：#FFF000;
+     * @param bool $isString - 是否返回字符串格式
      * @return array |string
      */
-    function hex_to_rgb($hexColor, $isString = false) {
+    function hex_to_rgb(string $hexColor, bool $isString = false) {
         $color = str_replace('#', '', $hexColor);
         if (strlen($color) > 3) {
             $rgb = array(
@@ -144,15 +144,15 @@ if (!function_exists('underline_to_hump')) {
     
     /**
      * 下划线命名转驼峰命名
-     * @param $str - 下划线命名字符串
-     * @param $is_first - 是否为大驼峰（即首字母也大写）
-     * @return mixed
+     * @param string $str - 下划线命名字符串
+     * @param bool $isFirst - 是否为大驼峰（即首字母也大写）
+     * @return string
      */
-    function underline_to_hump($str, $is_first = false) {
+    function underline_to_hump(string $str, bool $isFirst = false): string {
         $str = preg_replace_callback('/([\-\_]+([a-z]{1}))/i', function ($matches) {
             return strtoupper($matches[2]);
         }, $str);
-        if ($is_first) {
+        if ($isFirst) {
             $str = ucfirst($str);
         }
         return $str;
@@ -163,10 +163,10 @@ if (!function_exists('hump_to_underline')) {
     
     /**
      * 驼峰命名转下划线命名
-     * @param $str
+     * @param string $str
      * @return mixed
      */
-    function hump_to_underline($str) {
+    function hump_to_underline(string $str): string {
         $str = preg_replace_callback('/([A-Z]{1})/', function ($matches) {
             return '_' . strtolower($matches[0]);
         }, $str);
@@ -183,7 +183,7 @@ if (!function_exists('cm_explode')) {
      * @param $delimiter - 分割符
      * @return array
      */
-    function cm_explode($string, $delimiter = ',') {
+    function cm_explode(string $string, string $delimiter = ','): array {
         if (!$string || !is_string($string)) {
             return [];
         }
@@ -204,9 +204,9 @@ if (!function_exists('cm_round')) {
      * 生成随机字符串
      * @param int $length - 指定生成字符串的长度
      * @param string $type - 指定生成字符串的类型（all-全部，num-纯数字，letter-纯字母）
-     * @return null|string
+     * @return string
      */
-    function cm_round($length = 4, $type = 'all') {
+    function cm_round(int $length = 4, string $type = 'all'): string {
         $str = '';
         $strUp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $strLow = 'abcdefghijklmnopqrstuvwxyz';
@@ -235,7 +235,7 @@ if (!function_exists('cm_uuid')) {
      * 生成UUID
      * @return string
      */
-    function cm_uuid() {
+    function cm_uuid(): string {
         $charId = md5(uniqid(mt_rand(), true));
         $uuid = substr($charId, 0, 8)
             . substr($charId, 8, 4)
@@ -253,7 +253,7 @@ if (!function_exists('cm_array_merge')) {
      * @param $array1 - 第一个参数必须，参数必须为数组
      * @return array
      */
-    function cm_array_merge($array1) {
+    function cm_array_merge(array $array1): array {
         $returnArray = [];
         $args = func_get_args();
         foreach ($args as $k => $v) {
@@ -276,7 +276,7 @@ if (!function_exists('format_array')) {
      * @param $delimiter - 分隔符，二级数组元素为字符串时
      * @return array -返回格式化后的数组
      */
-    function format_array($array, $key = 'id', $value = 'name', $delimiter = ':') {
+    function format_array(array $array, string $key = 'id', string $value = 'name', string $delimiter = ':'): array {
         $returnArray = [];
         if (!$array || !is_array($array) || count($array) < 1) {
             return $returnArray;
@@ -305,10 +305,10 @@ if (!function_exists('array_serialize_url')) {
     
     /**
      * 数组序列化url字符串
-     * @param $array - 数组（键值对）
+     * @param array $array - 数组（键值对）
      * @return string -序列化后的字符串
      */
-    function array_serialize_url($array) {
+    function array_serialize_url(array $array): string {
         $str = '';
         if (!is_array($array) || count($array) < 1) {
             return $str;

@@ -161,11 +161,14 @@ class App extends \think\App
      * 获取根目录
      * @return string
      */
-    protected function getBaseRoot() {
+    protected function getBaseRoot(): string {
+        if (defined('BASE_ROOT')) {
+            return BASE_ROOT;
+        }
         $scriptName = realpath($this->scriptName);
         $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $this->request->baseFile());
         $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
-        $baseRoot = preg_replace($pattern, "$1", $scriptName) . DIRECTORY_SEPARATOR;
-        return $baseRoot;
+        $baseRoot = preg_replace($pattern, "$1", $scriptName);
+        return realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
     }
 }

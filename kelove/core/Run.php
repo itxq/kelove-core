@@ -13,6 +13,7 @@
 namespace kelove\core;
 
 use kelove\traits\SingleModelTrait;
+use think\Exception;
 
 /**
  * 初始化应用
@@ -44,13 +45,18 @@ class Run
      * @param string $path 应用路径
      */
     public function appRun(bool $debug = false, string $name = '', string $namespace = '', string $path = ''): void {
-        $app = new App($this->kelovePath);
-        $app->debug($debug)
-            ->setBasePath($this->kelovePath)
-            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
-            ->name($name)
-            ->setNamespace($namespace)
-            ->path($path)
-            ->run()->send();
+        ini_set('display_errors', 'Off');
+        try {
+            $app = new App($this->kelovePath);
+            $app->debug($debug)
+                ->setBasePath($this->kelovePath)
+                ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
+                ->name($name)
+                ->setNamespace($namespace)
+                ->path($path)
+                ->run()->send();
+        } catch (Exception $exception) {
+            exit();
+        }
     }
 }

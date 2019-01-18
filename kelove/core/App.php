@@ -164,7 +164,8 @@ class App extends \think\App
     protected function getBaseRoot() {
         $scriptName = realpath($this->scriptName);
         $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $this->request->baseFile());
-        $baseRoot = preg_replace('/^(.*?)(' . addslashes($baseFile) . ')$/', "\\1", $scriptName) . DIRECTORY_SEPARATOR;
+        $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
+        $baseRoot = preg_replace($pattern, "$1", $scriptName) . DIRECTORY_SEPARATOR;
         return $baseRoot;
     }
 }

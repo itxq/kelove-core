@@ -12,6 +12,7 @@
 
 namespace kelove\core;
 
+use Composer\Autoload\ClassLoader;
 use kelove\traits\SingleModelTrait;
 use think\Exception;
 
@@ -39,13 +40,17 @@ class Run
     
     /**
      * 初始化应用
+     * @param \Composer\Autoload\ClassLoader $loader
      * @param bool $debug 是否开启调试
      * @param string $name 应用名称
      * @param string $namespace 应用命名空间
      * @param string $path 应用路径
      */
-    public function appRun(bool $debug = false, string $name = '', string $namespace = '', string $path = ''): void {
+    public function appRun(ClassLoader $loader, bool $debug = false, string $name = '', string $namespace = '', string $path = ''): void {
         ini_set('display_errors', 'Off');
+        if (empty($path)) {
+            $path = $this->getNamespacePath($loader, $namespace);
+        }
         try {
             $app = new App($this->kelovePath);
             $app->debug($debug)
@@ -58,5 +63,23 @@ class Run
         } catch (Exception $exception) {
             exit();
         }
+    }
+    
+    /**
+     * 获取命名空间路径
+     * @param ClassLoader $loader
+     * @param string $namespace 应用命名空间
+     * @return string
+     */
+    protected function getNamespacePath(ClassLoader $loader, string $namespace): string {
+        $psr4 = $loader->getPrefixesPsr4();
+        if (!isset($psr4[$namespace . '\\'][0])) {
+            return '';
+        }
+        $path = realpath($psr4[$namespace . '\\'][0]);
+        if (!$path) {
+            return '';
+        }
+        return $path . DIRECTORY_SEPARATOR;
     }
 }

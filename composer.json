@@ -1,15 +1,15 @@
 {
-    "name"       : "itxq/kelove-core",
-    "description": "kelove-core kelove框架核心类库",
-    "type"       : "library",
-    "license"    : "Apache-2.0",
-    "authors"    : [
+    "name"        : "itxq/kelove-core",
+    "description" : "kelove-core kelove框架核心类库",
+    "type"        : "library",
+    "license"     : "Apache-2.0",
+    "authors"     : [
         {
             "name" : "IT小强xqitw.cn",
             "email": "mail@xqitw.cn"
         }
     ],
-    "require"    : {
+    "require"     : {
         "php"                 : ">=7.1.0",
         "ext-pdo"             : "*",
         "ext-zlib"            : "*",
@@ -17,16 +17,23 @@
         "ext-json"            : "*",
         "ext-gd"              : "*",
         "ext-iconv"           : "*",
-        "topthink/framework"  : "5.2.*-dev",
         "guzzlehttp/guzzle"   : "^6.3",
         "topthink/think-image": "^1.0"
     },
-    "autoload"   : {
+    "require-dev" : {
+        "topthink/framework": "5.2.*-dev"
+    },
+    "autoload"    : {
         "psr-4": {
-            "kelove\\": "kelove"
+            "kelove\\": "src"
         },
         "files": [
             "kelove/helper.php"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "test\\": "test"
+        }
     }
 }

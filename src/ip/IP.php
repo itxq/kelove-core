@@ -23,6 +23,17 @@ class IP
 {
     use SingleModelTrait;
     
+    const  BEGIN_IP = 'begin_ip';
+    const  END_IP = 'end_ip';
+    const  COUNTRY = 'country';
+    const  AREA = 'area';
+    const  LOCATION = 'location';
+    
+    /**
+     * @var array - 查询结果
+     */
+    protected $ipInfo = [];
+    
     /**
      * IP数据库文件句柄
      * @var bool|resource
@@ -48,42 +59,18 @@ class IP
     protected $total;
     
     /**
-     * 查询地区信息
-     * @return string
-     */
-    protected function getArea(): string {
-        $byte = fread($this->fh, 1); //标志字节
-        switch (ord($byte)) {
-            case 0:
-                $area = '';
-                break; //没有地区信息
-            case 1: //地区被重定向
-                fseek($this->fh, $this->getLong3());
-                $area = $this->getInfo();
-                break;
-            case 2: //地区被重定向
-                fseek($this->fh, $this->getLong3());
-                $area = $this->getInfo();
-                break;
-            default:
-                $area = $this->getInfo($byte);
-                break; //地区没有被重定向
-        }
-        return $area;
-    }
-    
-    /**
      * 查询IP信息
      * @param string $ip - ip地址
      * @param string $path - IP数据库文件路径
-     * @return bool
+     * @return IP
      */
-    public function lookup(string $ip, string $path = '') {
+    public function lookup(string $ip, string $path = ''): IP {
         if (empty($path)) {
             $path = realpath(__DIR__ . '/data/qqwry.dat');
         }
         if (!$this->checkIp($ip)) {
-            return false;
+            $this->ipInfo = [];
+            return $this;
         }
         $this->ini($path);
         $ip = pack('N', intval(ip2long($ip)));
@@ -109,10 +96,10 @@ class IP
         }
         //查询国家地区信息
         fseek($this->fh, $findip);
-        $location['beginip'] = long2ip($this->getLong4()); //用户IP所在范围的开始地址
+        $location[self::BEGIN_IP] = long2ip($this->getLong4()); //用户IP所在范围的开始地址
         $offset = $this->getlong3();
         fseek($this->fh, $offset);
-        $location['endip'] = long2ip($this->getLong4()); //用户IP所在范围的结束地址
+        $location[self::END_IP] = long2ip($this->getLong4()); //用户IP所在范围的结束地址
         $byte = fread($this->fh, 1); //标志字节
         switch (ord($byte)) {
             case 1:  //国家和区域信息都被重定向
@@ -122,32 +109,45 @@ class IP
                 switch (ord($byte)) {
                     case 2: //国家信息被二次重定向
                         fseek($this->fh, $this->getLong3());
-                        $location['country'] = $this->getInfo();
+                        $location[self::COUNTRY] = $this->getInfo();
                         fseek($this->fh, $countryOffset + 4);
-                        $location['area'] = $this->getArea();
+                        $location[self::AREA] = $this->getArea();
                         break;
                     default: //国家信息没有被二次重定向
-                        $location['country'] = $this->getInfo($byte);
-                        $location['area'] = $this->getArea();
+                        $location[self::COUNTRY] = $this->getInfo($byte);
+                        $location[self::AREA] = $this->getArea();
                         break;
                 }
                 break;
             case 2: //国家信息被重定向
                 fseek($this->fh, $this->getLong3());
-                $location['country'] = $this->getInfo();
+                $location[self::COUNTRY] = $this->getInfo();
                 fseek($this->fh, $offset + 8);
-                $location['area'] = $this->getArea();
+                $location[self::AREA] = $this->getArea();
                 break;
             default: //国家信息没有被重定向
-                $location['country'] = $this->getInfo($byte);
-                $location['area'] = $this->getArea();
+                $location[self::COUNTRY] = $this->getInfo($byte);
+                $location[self::AREA] = $this->getArea();
                 break;
         }
         //gb2312 to utf-8（去除无信息时显示的CZ88.NET）
         foreach ($location as $k => $v) {
             $location[$k] = str_replace('CZ88.NET', '', iconv('gb2312', 'utf-8', $v));
         }
-        return $location;
+        $this->ipInfo = $location;
+        return $this;
+    }
+    
+    /**
+     * 获取IP解析结果
+     * @param string $type - 获取类型
+     * @return array|mixed
+     */
+    public function get(string $type = self::LOCATION) {
+        if ($type === self::LOCATION && count($this->ipInfo) === 4) {
+            return $this->ipInfo;
+        }
+        return get_sub_value($type, $this->ipInfo, false);
     }
     
     /**
@@ -159,6 +159,31 @@ class IP
         $this->first = $this->getLong4();
         $this->last = $this->getLong4();
         $this->total = ($this->last - $this->first) / 7; //每条索引7字节
+    }
+    
+    /**
+     * 查询地区信息
+     * @return string
+     */
+    protected function getArea(): string {
+        $byte = fread($this->fh, 1); //标志字节
+        switch (ord($byte)) {
+            case 0:
+                $area = '';
+                break; //没有地区信息
+            case 1: //地区被重定向
+                fseek($this->fh, $this->getLong3());
+                $area = $this->getInfo();
+                break;
+            case 2: //地区被重定向
+                fseek($this->fh, $this->getLong3());
+                $area = $this->getInfo();
+                break;
+            default:
+                $area = $this->getInfo($byte);
+                break; //地区没有被重定向
+        }
+        return $area;
     }
     
     /**

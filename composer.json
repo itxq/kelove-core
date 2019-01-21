@@ -28,7 +28,7 @@
             "kelove\\": "src"
         },
         "files": [
-            "kelove/helper.php"
+            "src/helper.php"
         ]
     },
     "autoload-dev": {

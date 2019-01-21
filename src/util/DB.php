@@ -24,6 +24,11 @@ class DB
     use SingleModelTrait;
     
     /**
+     * @var string - 换行符
+     */
+    protected $eol = PHP_EOL;
+    
+    /**
      * @var \think\facade\Db
      */
     protected $db;
@@ -49,9 +54,9 @@ class DB
     private $size = 0;
     
     /**
-     * @var integer -备份配置
+     * @var integer - 默认备份配置
      */
-    protected $config = [
+    protected $defaultConfig = [
         // 数据库备份路径
         'path'     => '',
         // 分卷大小
@@ -75,7 +80,7 @@ class DB
      */
     protected function initialize(array $config = []): void {
         $this->file = get_sub_value('file', $config, []);
-        $this->db = \think\facade\Db::connect();
+        $this->db = \think\facade\Db::connect(get_sub_value('database', $config, []));
     }
     
     /**
@@ -83,17 +88,17 @@ class DB
      * @return int|bool
      */
     public function create() {
-        $sql = "-- -----------------------------\n";
-        $sql .= "-- MySQL Data Transfer\n";
-        $sql .= "--\n";
-        $sql .= "-- Host     : " . config('database.hostname') . "\n";
-        $sql .= "-- Port     : " . config('database.hostport') . "\n";
-        $sql .= "-- Database : " . config('database.database') . "\n";
-        $sql .= "--\n";
-        $sql .= "-- Part : #{$this->file['part']}\n";
-        $sql .= "-- Date : " . date("Y-m-d H:i:s") . "\n";
-        $sql .= "-- -----------------------------\n\n";
-        $sql .= "SET FOREIGN_KEY_CHECKS = 0;\n\n";
+        $sql = "-- -----------------------------$this->eol";
+        $sql .= "-- MySQL Data Transfer$this->eol";
+        $sql .= "--$this->eol";
+        $sql .= "-- Host     : " . config('database.hostname') . "$this->eol";
+        $sql .= "-- Port     : " . config('database.hostport') . "$this->eol";
+        $sql .= "-- Database : " . config('database.database') . "$this->eol";
+        $sql .= "--$this->eol";
+        $sql .= "-- Part : #{$this->file['part']}$this->eol";
+        $sql .= "-- Date : " . date("Y-m-d H:i:s") . "$this->eol";
+        $sql .= "-- -----------------------------{$this->eol}{$this->eol}";
+        $sql .= "SET FOREIGN_KEY_CHECKS = 0;{$this->eol}{$this->eol}";
         return $this->write($sql);
     }
     
@@ -114,7 +119,7 @@ class DB
                 $start = $this->backup($table, $start[0]);
             }
         }
-        $sql = "\n\nSET FOREIGN_KEY_CHECKS = 1;\n\n";
+        $sql = "{$this->eol}{$this->eol}SET FOREIGN_KEY_CHECKS = 1;{$this->eol}{$this->eol}";
         return $this->write($sql) ? true : false;
     }
     
@@ -145,18 +150,18 @@ class DB
      * @param array $tables 表名
      * @param string $path 导出路径
      * @param string $prefix 表前缀
-     * @param bool $export_data 是否导出数据
+     * @param bool $exportData 是否导出数据
      * @return bool
      */
-    public function export(array $tables = [], string $path = '', string $prefix = '', bool $export_data = true) {
+    public function export(array $tables = [], string $path = '', string $prefix = '', bool $exportData = true) {
         $datetime = date('Y-m-d H:i:s', time());
-        $sql = "-- -----------------------------\n";
-        $sql .= "-- 导出时间 `{$datetime}`\n";
-        $sql .= "-- -----------------------------\n";
+        $sql = "-- -----------------------------$this->eol";
+        $sql .= "-- 导出时间 `{$datetime}`$this->eol";
+        $sql .= "-- -----------------------------$this->eol";
         
         if (!empty($tables)) {
             foreach ($tables as $table) {
-                $sql .= $this->getSql($prefix . $table, $export_data);
+                $sql .= $this->getSql($prefix . $table, $exportData);
             }
             
             // 写入文件
@@ -176,13 +181,13 @@ class DB
      */
     public function exportUninstall(array $tables = [], string $path = '', string $prefix = ''): bool {
         $datetime = date('Y-m-d H:i:s', time());
-        $sql = "-- -----------------------------\n";
-        $sql .= "-- 导出时间 `{$datetime}`\n";
-        $sql .= "-- -----------------------------\n";
+        $sql = "-- -----------------------------$this->eol";
+        $sql .= "-- 导出时间 `{$datetime}`$this->eol";
+        $sql .= "-- -----------------------------$this->eol";
         
         if (!empty($tables)) {
             foreach ($tables as $table) {
-                $sql .= "DROP TABLE IF EXISTS `{$prefix}{$table}`;\n";
+                $sql .= "DROP TABLE IF EXISTS `{$prefix}{$table}`;$this->eol";
             }
             
             // 写入文件
@@ -196,28 +201,29 @@ class DB
     /**
      * 获取表结构和数据
      * @param string $table 表名
-     * @param bool $export_data 是否导出数据
+     * @param bool $exportData 是否导出数据
      * @param int $start 起始行数
      * @return string
      */
-    public function getSql(string $table, bool $export_data = false, int $start = 0): string {
+    public function getSql(string $table, bool $exportData = false, int $start = 0): string {
         $sql = "";
         if ($this->db->query("SHOW TABLES LIKE '%{$table}%'")) {
+            
             // 表结构
             if ($start == 0) {
                 $result = $this->db->query("SHOW CREATE TABLE `{$table}`");
-                $sql .= "\n-- -----------------------------\n";
-                $sql .= "-- 表结构 `{$table}`\n";
-                $sql .= "-- -----------------------------\n";
-                $sql .= "DROP TABLE IF EXISTS `{$table}`;\n";
-                $sql .= trim($result[0]['Create Table']) . ";\n\n";
+                $sql .= "$this->eol-- -----------------------------$this->eol";
+                $sql .= "-- 表结构 `{$table}`$this->eol";
+                $sql .= "-- -----------------------------$this->eol";
+                $sql .= "DROP TABLE IF EXISTS `{$table}`;$this->eol";
+                $sql .= trim($result[0]['Create Table']) . ";{$this->eol}{$this->eol}";
             }
             
             // 表数据
-            if ($export_data) {
-                $sql .= "-- -----------------------------\n";
-                $sql .= "-- 表数据 `{$table}`\n";
-                $sql .= "-- -----------------------------\n";
+            if ($exportData) {
+                $sql .= "-- -----------------------------$this->eol";
+                $sql .= "-- 表数据 `{$table}`$this->eol";
+                $sql .= "-- -----------------------------$this->eol";
                 
                 // 数据总数
                 $result = $this->db->query("SELECT COUNT(*) AS count FROM `{$table}`");
@@ -226,13 +232,12 @@ class DB
                 // 备份数据记录
                 $result = $this->db->query("SELECT * FROM `{$table}` LIMIT {$start}, 1000");
                 foreach ($result as $row) {
-                    $row = array_map('addslashes', $row);
-                    $sql .= "INSERT INTO `{$table}` VALUES ('" . str_replace(array("\r", "\n"), array('\r', '\n'), implode("', '", $row)) . "');\n";
+                    $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'], $this->getInsertValue($row)) . ");$this->eol";
                 }
                 
                 // 还有更多数据
                 if ($count > $start + 1000) {
-                    $sql .= $this->getSql($table, $export_data, $start + 1000);
+                    $sql .= $this->getSql($table, $exportData, $start + 1000);
                 }
             }
         }
@@ -252,12 +257,12 @@ class DB
             $result = $this->db->query("SHOW CREATE TABLE `{$table}`");
             $result = array_map('array_change_key_case', $result);
             
-            $sql = "\n";
-            $sql .= "-- -----------------------------\n";
-            $sql .= "-- Table structure for `{$table}`\n";
-            $sql .= "-- -----------------------------\n";
-            $sql .= "DROP TABLE IF EXISTS `{$table}`;\n";
-            $sql .= trim($result[0]['create table']) . ";\n\n";
+            $sql = "$this->eol";
+            $sql .= "-- -----------------------------$this->eol";
+            $sql .= "-- Table structure for `{$table}`$this->eol";
+            $sql .= "-- -----------------------------$this->eol";
+            $sql .= "DROP TABLE IF EXISTS `{$table}`;$this->eol";
+            $sql .= trim($result[0]['create table']) . ";{$this->eol}{$this->eol}";
             if (false === $this->write($sql)) {
                 return false;
             }
@@ -271,16 +276,16 @@ class DB
         if ($count) {
             // 写入数据注释
             if (0 == $start) {
-                $sql = "-- -----------------------------\n";
-                $sql .= "-- Records of `{$table}`\n";
-                $sql .= "-- -----------------------------\n";
+                $sql = "-- -----------------------------$this->eol";
+                $sql .= "-- Records of `{$table}`$this->eol";
+                $sql .= "-- -----------------------------$this->eol";
                 $this->write($sql);
             }
             
             // 备份数据记录
             $result = $this->db->query("SELECT * FROM `{$table}` LIMIT {$start}, 1000");
             foreach ($result as $k => $row) {
-                $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n"], ['\r', '\n'], $this->getInsertValue($row)) . ");\n";
+                $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'], $this->getInsertValue($row)) . ");$this->eol";
                 if (false === $this->write($sql)) {
                     return false;
                 }
@@ -397,7 +402,7 @@ class DB
      * 获取数据库中所有表名
      * @return array
      */
-    public function getTables() {
+    public function getTables(): array {
         try {
             return $this->db->query('show tables');
         } catch (\PDOException $exception) {

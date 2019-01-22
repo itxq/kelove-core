@@ -21,7 +21,10 @@
         "topthink/think-image": "^1.0"
     },
     "require-dev" : {
-        "topthink/framework": "5.2.*-dev"
+        "topthink/framework" : "5.2.*-dev",
+        "itxq/ckfinder"      : "^1.0",
+        "itxq/builder"       : "dev-master",
+        "itxq/builder-assets": "dev-master"
     },
     "autoload"    : {
         "psr-4": {
@@ -34,6 +37,11 @@
     "autoload-dev": {
         "psr-4": {
             "test\\": "test"
+        }
+    },
+    "extra"       : {
+        "installer-paths": {
+            "public/static/{$name}": ["itxq/builder-assets"]
         }
     }
 }

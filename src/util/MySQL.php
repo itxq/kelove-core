@@ -1,8 +1,8 @@
 <?php
 /**
  *  ==================================================================
- *        文 件 名: DB.php
- *        概    要: 数据库备份还原
+ *        文 件 名: MySQL.php
+ *        概    要: MySQL数据库备份还原
  *        作    者: IT小强
  *        创建时间: 2019-01-02 16:35:19
  *        修改时间:
@@ -15,11 +15,11 @@ namespace kelove\util;
 use kelove\traits\SingleModelTrait;
 
 /**
- * 数据库备份还原
- * Class DB
+ * MySQL数据库备份还原
+ * Class MySQL
  * @package kelove\util
  */
-class DB
+class MySQL
 {
     use SingleModelTrait;
     
@@ -404,8 +404,13 @@ class DB
      */
     public function getTables(): array {
         try {
-            return $this->db->query('show tables');
-        } catch (\PDOException $exception) {
+            $tables = [];
+            $tableInfo = $this->db->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . $this->config['database']['database'] . '\'');
+            foreach ($tableInfo as $k => $v) {
+                $tables[] = is_array($v) ? array_values($v)[0] : $v;
+            }
+            return $tables;
+        } catch (\Exception $exception) {
             return [];
         }
     }

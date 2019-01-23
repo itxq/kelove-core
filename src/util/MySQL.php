@@ -13,6 +13,7 @@
 namespace kelove\util;
 
 use kelove\traits\SingleModelTrait;
+use think\facade\Config;
 
 /**
  * MySQL数据库备份还原
@@ -29,7 +30,7 @@ class MySQL
     protected $eol = PHP_EOL;
     
     /**
-     * @var \think\facade\Db
+     * @var \think\facade\Db - 数据库操作类
      */
     protected $db;
     
@@ -43,7 +44,7 @@ class MySQL
      */
     private $file = [
         // name - 文件名
-        'name' => '',
+        'name' => 'sql_backup',
         // part - 卷号
         'part' => 1
     ];
@@ -58,7 +59,7 @@ class MySQL
      */
     protected $defaultConfig = [
         // 数据库备份路径
-        'path'     => '',
+        'path'     => __DIR__ . '/',
         // 分卷大小
         'part'     => '20971520',
         // 是否压缩
@@ -75,12 +76,18 @@ class MySQL
     ];
     
     /**
+     * @var array - 数据库配置信息
+     */
+    protected $database = [];
+    
+    /**
      * 初始化加载
      * @param array $config - 配置信息
      */
     protected function initialize(array $config = []): void {
         $this->file = get_sub_value('file', $config, []);
-        $this->db = \think\facade\Db::connect(get_sub_value('database', $config, []));
+        $this->database = array_merge((array)Config::pull('database'), get_sub_value('database', $config, []));
+        $this->db = \think\facade\Db::connect($this->database);
     }
     
     /**
@@ -91,9 +98,9 @@ class MySQL
         $sql = "-- -----------------------------$this->eol";
         $sql .= "-- MySQL Data Transfer$this->eol";
         $sql .= "--$this->eol";
-        $sql .= "-- Host     : " . config('database.hostname') . "$this->eol";
-        $sql .= "-- Port     : " . config('database.hostport') . "$this->eol";
-        $sql .= "-- Database : " . config('database.database') . "$this->eol";
+        $sql .= "-- Host     : " . get_sub_value('hostname', $this->database, '127.0.0.1') . "$this->eol";
+        $sql .= "-- Port     : " . get_sub_value('hostport', $this->database, '3306') . "$this->eol";
+        $sql .= "-- Database : " . get_sub_value('database', $this->database, '') . "$this->eol";
         $sql .= "--$this->eol";
         $sql .= "-- Part : #{$this->file['part']}$this->eol";
         $sql .= "-- Date : " . date("Y-m-d H:i:s") . "$this->eol";
@@ -405,7 +412,8 @@ class MySQL
     public function getTables(): array {
         try {
             $tables = [];
-            $tableInfo = $this->db->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . $this->config['database']['database'] . '\'');
+            $tableInfo = $this->db
+                ->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . get_sub_value('database', $this->database, '') . '\'');
             foreach ($tableInfo as $k => $v) {
                 $tables[] = is_array($v) ? array_values($v)[0] : $v;
             }

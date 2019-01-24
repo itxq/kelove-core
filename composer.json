@@ -21,6 +21,7 @@
         "topthink/think-image": "^1.0"
     },
     "require-dev" : {
+        "ext-redis"          : "*",
         "topthink/framework" : "5.2.*-dev",
         "itxq/ckfinder"      : "^1.0",
         "itxq/builder"       : "dev-master",

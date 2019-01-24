@@ -106,7 +106,8 @@ class App extends \think\App
         }
         // 自定义路由目录
         if (!empty($this->rootRoutePath)) {
-            $this->routePath = str_replace($this->rootPath . 'route', realpath($this->rootRoutePath), $this->routePath);
+            // $this->routePath = str_replace($this->rootPath . 'route', realpath($this->rootRoutePath), $this->routePath);
+            $this->routePath = $this->rootRoutePath;
             $this->env->set(['route_path' => $this->routePath]);
         }
         // 自定义配置目录

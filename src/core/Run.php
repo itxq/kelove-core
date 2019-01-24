@@ -13,7 +13,6 @@
 namespace kelove\core;
 
 use kelove\traits\SingleModelTrait;
-use think\Exception;
 use think\facade\Event;
 
 /**
@@ -67,6 +66,7 @@ class Run
             if (!$this->appInfoCheck($v)) {
                 continue;
             }
+            $v['app_path'] = realpath($v['app_path']) . DIRECTORY_SEPARATOR;
             $list[$v['app_name']] = $v;
         }
         return $list;
@@ -75,30 +75,28 @@ class Run
     /**
      * 初始化应用
      * @param string $name 应用名称
-     * @param bool $debug 是否开启调试
+     * @return App
      */
-    public function appRun(bool $debug = false, string $name = ''): void {
+    public function app(string $name = ''): App {
         ini_set('display_errors', 'Off');
         $autoName = $this->app->getName();
         if (in_array($autoName, array_keys($this->appList))) {
             $name = $autoName;
         }
-        try {
-            $appInfo = $this->appList[$name];
-            $path = $appInfo['app_path'];
-            $namespace = $appInfo['app_namespace'];
-            $this->app
-                ->name($name)
-                ->debug($debug)
-                ->setBasePath($this->kelovePath)
-                ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
-                ->setNamespace($namespace)
-                ->path($path)
-                ->run()
-                ->send();
-        } catch (Exception $exception) {
-            exit();
+        $appInfo = $this->appList[$name];
+        $path = $appInfo['app_path'];
+        $namespace = $appInfo['app_namespace'];
+        $this->app
+            ->name($name)
+            ->setBasePath($this->kelovePath)
+            ->setRootConfigPath($this->kelovePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
+            ->setNamespace($namespace)
+            ->path($path);
+        if (is_dir($path . 'route')) {
+            $this->app->setRootRoutePath($path . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR);
         }
+        return $this->app;
     }
     
     /**
@@ -111,6 +109,7 @@ class Run
             !isset($info['app_name']) ||
             !isset($info['app_title']) ||
             !isset($info['app_path']) ||
+            !is_dir($info['app_path']) ||
             !isset($info['app_namespace'])
         ) {
             return false;

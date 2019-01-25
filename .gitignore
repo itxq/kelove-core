@@ -1,6 +1,7 @@
 /.idea
 /vendor
 /test
+/app
 /public
 /runtime
 /composer.lock

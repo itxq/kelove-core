@@ -82,6 +82,7 @@ class Run
             ->setBasePath($this->kelovePath)
             ->setRootConfigPath($this->kelovePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR)
             ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setNamespace($namespace)
             ->path($path);
         if (is_dir($path . 'route')) {

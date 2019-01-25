@@ -1,6 +1,7 @@
 /.idea
 /vendor
 /test
+/config
 /app
 /public
 /runtime

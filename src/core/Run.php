@@ -13,6 +13,7 @@
 namespace kelove\core;
 
 use kelove\traits\SingleModelTrait;
+use kelove\util\File;
 use think\facade\Event;
 
 /**
@@ -40,6 +41,11 @@ class Run
     protected $appList = [];
     
     /**
+     * @var array - 自动多应用，应用名映射
+     */
+    protected $autoMulti = [];
+    
+    /**
      * @var \kelove\core\App
      */
     protected $app;
@@ -52,24 +58,9 @@ class Run
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App($this->kelovePath);
-        $this->app->autoMulti();
-    }
-    
-    /**
-     * 获取全部应用列表
-     * @return mixed
-     */
-    protected function getAppList() {
-        $list = [];
-        $appList = Event::trigger(self::APP_LIST_EVENT);
-        foreach ($appList as $v) {
-            if (!$this->appInfoCheck($v)) {
-                continue;
-            }
-            $v['app_path'] = realpath($v['app_path']) . DIRECTORY_SEPARATOR;
-            $list[$v['app_name']] = $v;
+        if (count($this->appList) > 1) {
+            $this->app->autoMulti($this->autoMulti);
         }
-        return $list;
     }
     
     /**
@@ -97,6 +88,41 @@ class Run
             $this->app->setRootRoutePath($path . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR);
         }
         return $this->app;
+    }
+    
+    /**
+     * 获取全部应用列表
+     * @return mixed
+     */
+    protected function getAppList() {
+        $list = [];
+        // 获取注册的应用
+        $appList = Event::trigger(self::APP_LIST_EVENT);
+        // 获取app目录下的应用
+        $appPath = BASE_ROOT . 'app' . DIRECTORY_SEPARATOR;
+        if (is_dir($appPath)) {
+            $dir = get_sub_value('dir', File::make()->getDirs($appPath), []);
+            foreach ($dir as $v) {
+                $infoFile = $appPath . $v . DIRECTORY_SEPARATOR . 'info.php';
+                if (is_file($infoFile)) {
+                    $appList[] = include $infoFile;
+                }
+            }
+        }
+        foreach ($appList as $v) {
+            if (!$this->appInfoCheck($v)) {
+                continue;
+            }
+            $v['app_path'] = realpath($v['app_path']) . DIRECTORY_SEPARATOR;
+            $v['app_alias'] = get_sub_value('app_alias', $v, '');
+            if (!empty($v['app_alias'])) {
+                $this->autoMulti[$v['app_alias']] = $v['app_name'];
+            } else {
+                $v['app_alias'] = $v['app_name'];
+            }
+            $list[$v['app_name']] = $v;
+        }
+        return $list;
     }
     
     /**

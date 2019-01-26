@@ -1,25 +1,26 @@
 <?php
 /**
  *  ==================================================================
- *        文 件 名: Model.php
+ *        文 件 名: Base.php
  *        概    要: 数据模型基类
  *        作    者: IT小强
- *        创建时间: 2018-12-25 13:39:40
+ *        创建时间: 2019-01-26 09:29:57
  *        修改时间:
- *        copyright (c) 2016 - 2018 mail@xqitw.cn
+ *        copyright (c) 2016 - 2019 mail@xqitw.cn
  *  ==================================================================
  */
 
-namespace kelove\core;
+namespace kelove\model;
 
+use think\Model;
 use think\model\concern\SoftDelete;
 
 /**
  * 数据模型基类
- * Class Model
- * @package kelove\core
+ * Class Base
+ * @package kelove\model
  */
-abstract class Model extends \think\Model
+abstract class Base extends Model
 {
     use SoftDelete;
     

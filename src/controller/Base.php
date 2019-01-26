@@ -1,23 +1,25 @@
 <?php
 /**
  *  ==================================================================
- *        文 件 名: Controller.php
+ *        文 件 名: Base.php
  *        概    要: 控制器基类
  *        作    者: IT小强
- *        创建时间: 2018-12-25 13:38:33
+ *        创建时间: 2019-01-26 09:27:19
  *        修改时间:
- *        copyright (c) 2016 - 2018 mail@xqitw.cn
+ *        copyright (c) 2016 - 2019 mail@xqitw.cn
  *  ==================================================================
  */
 
-namespace kelove\core;
+namespace kelove\controller;
+
+use think\Controller;
 
 /**
  * 控制器基类
- * Class Controller
- * @package kelove\core
+ * Class Base
+ * @package kelove\controller
  */
-abstract class Controller extends \think\Controller
+abstract class Base extends Controller
 {
-    
+
 }

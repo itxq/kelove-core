@@ -15,6 +15,7 @@ namespace kelove\core;
 use kelove\traits\SingleModelTrait;
 use kelove\util\File;
 use think\facade\Event;
+use think\facade\Request;
 
 /**
  * 初始化应用
@@ -29,6 +30,11 @@ class Run
      * 应用列表事件标识
      */
     const APP_LIST_EVENT = 'kelove_app_list';
+    
+    /**
+     * @var string 应用入口文件
+     */
+    protected $scriptName;
     
     /**
      * @var string 核心目录
@@ -55,6 +61,8 @@ class Run
      * @param array $config - 配置信息
      */
     protected function initialize(array $config = []): void {
+        $this->scriptName = $this->getScriptName();
+        $this->getBaseRoot();
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App($this->kelovePath);
@@ -95,7 +103,7 @@ class Run
      * 获取全部应用列表
      * @return mixed
      */
-    protected function getAppList() {
+    private function getAppList() {
         $list = [];
         // 获取注册的应用
         $appList = Event::trigger(self::APP_LIST_EVENT);
@@ -142,5 +150,27 @@ class Run
             return false;
         }
         return true;
+    }
+    
+    /**
+     * 获取根目录
+     */
+    private function getBaseRoot(): void {
+        if (!defined('BASE_ROOT')) {
+            $scriptName = realpath($this->scriptName);
+            $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], Request::baseFile());
+            $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
+            $baseRoot = preg_replace($pattern, "$1", $scriptName);
+            $baseRoot = realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
+            define('BASE_ROOT', $baseRoot);
+        }
+    }
+    
+    /**
+     * 获取入口文件路径
+     * @return string
+     */
+    private function getScriptName(): string {
+        return 'cli' == PHP_SAPI ? realpath($_SERVER['argv'][0]) : $_SERVER['SCRIPT_FILENAME'];
     }
 }

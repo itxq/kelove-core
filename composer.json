@@ -38,7 +38,10 @@
         "psr-4": {
             "app\\" : "app",
             "test\\": "test"
-        }
+        },
+        "files": [
+            "test/info.php"
+        ]
     },
     "extra"       : {
         "installer-paths": {

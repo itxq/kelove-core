@@ -12,6 +12,8 @@
 
 namespace kelove\core;
 
+use think\facade\Request;
+
 /**
  * 应用管理
  * Class App
@@ -36,6 +38,28 @@ class App extends \think\App
      * @var string
      */
     protected $rootConfigPath = '';
+    
+    /**
+     * 自动多应用访问
+     * @access public
+     * @param  array $map 应用路由映射
+     * @return $this
+     */
+    public function autoMulti(array $map = []) {
+        $this->multi = true;
+        $this->auto = true;
+        if (!empty(Request::path())) {
+            $path = explode('/', trim(Request::path(), '/'));
+            $name = $path[0];
+            
+            if (isset($map[$name]) && $map[$name] instanceof \Closure) {
+                $map[$name]($this);
+            } elseif ($name) {
+                $this->name = $map[$name] ?? $name;
+            }
+        }
+        return $this;
+    }
     
     /**
      * 设置应用基础目录
@@ -131,7 +155,7 @@ class App extends \think\App
      */
     protected function setDependPath(): void {
         // 获取根目录
-        $baseRoot = $this->getBaseRoot();
+        $baseRoot = BASE_ROOT;
         if (!$this->appPath) {
             $this->appPath = $baseRoot . 'app' . ($this->multi ? DIRECTORY_SEPARATOR . $this->name : '') . DIRECTORY_SEPARATOR;
         }
@@ -148,7 +172,7 @@ class App extends \think\App
         if (is_dir($path)) {
             return realpath($path) . DIRECTORY_SEPARATOR;
         }
-        $path = $this->getBaseRoot() . $path;
+        $path = BASE_ROOT . $path;
         if (is_dir($path)) {
             return realpath($path) . DIRECTORY_SEPARATOR;
         }
@@ -156,20 +180,5 @@ class App extends \think\App
             return false;
         }
         return realpath($path) . DIRECTORY_SEPARATOR;
-    }
-    
-    /**
-     * 获取根目录
-     * @return string
-     */
-    protected function getBaseRoot(): string {
-        if (defined('BASE_ROOT')) {
-            return BASE_ROOT;
-        }
-        $scriptName = realpath($this->scriptName);
-        $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $this->request->baseFile());
-        $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
-        $baseRoot = preg_replace($pattern, "$1", $scriptName);
-        return realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
     }
 }

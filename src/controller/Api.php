@@ -10,7 +10,7 @@
  *  ==================================================================
  */
 
-namespace kelove\core;
+namespace kelove\controller;
 
 /**
  * @title API 控制器基类
@@ -19,7 +19,7 @@ namespace kelove\core;
  * Class Api
  * @package kelove\core
  */
-abstract class Api extends Controller
+abstract class Api extends Base
 {
     const POST = 'post';
     const GET = 'get';

@@ -12,8 +12,6 @@
 
 namespace kelove\core;
 
-use think\facade\Request;
-
 /**
  * 应用管理
  * Class App
@@ -48,10 +46,9 @@ class App extends \think\App
     public function autoMulti(array $map = []) {
         $this->multi = true;
         $this->auto = true;
-        if (!empty(Request::path())) {
-            $path = explode('/', trim(Request::path(), '/'));
+        if (!empty($this->request->path())) {
+            $path = explode('/', trim($this->request->path(), '/'));
             $name = $path[0];
-            
             if (isset($map[$name]) && $map[$name] instanceof \Closure) {
                 $map[$name]($this);
             } elseif ($name) {

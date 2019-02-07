@@ -43,19 +43,8 @@ class App extends \think\App
      * @param  array $map 应用路由映射
      * @return $this
      */
-    public function autoMulti(array $map = []) {
-        $this->multi = true;
-        $this->auto = true;
-        if (!empty($this->request->path())) {
-            $path = explode('/', trim($this->request->path(), '/'));
-            $name = $path[0];
-            if (isset($map[$name]) && $map[$name] instanceof \Closure) {
-                $map[$name]($this);
-            } elseif ($name) {
-                $this->name = $map[$name] ?? $name;
-            }
-        }
-        return $this;
+    public function autoMultiCheck(array $map = []) {
+        return $this->autoMulti($map);
     }
     
     /**

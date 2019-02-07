@@ -67,7 +67,7 @@ class Run
         $this->appList = $this->getAppList();
         $this->app = new App($this->kelovePath);
         if (count($this->appList) > 1) {
-            $this->app->autoMulti($this->autoMulti);
+            $this->app->autoMultiCheck($this->autoMulti);
         }
     }
     

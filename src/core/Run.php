@@ -66,9 +66,7 @@ class Run
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App($this->kelovePath);
-        if (count($this->appList) > 1) {
-            $this->app->autoMultiCheck($this->autoMulti);
-        }
+        $this->app->autoMultiCheck($this->appList, $this->autoMulti);
     }
     
     /**

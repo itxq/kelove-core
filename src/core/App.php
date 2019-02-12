@@ -40,10 +40,18 @@ class App extends \think\App
     /**
      * 自动多应用访问
      * @access public
+     * @param  array $appList 注册的应用列表
      * @param  array $map 应用路由映射
      * @return $this
      */
-    public function autoMultiCheck(array $map = []) {
+    public function autoMultiCheck(array $appList, array $map = []) {
+        if (count($appList) <= 1) {
+            return $this;
+        }
+        $name = strstr($this->request->path(), '/', true);
+        if (empty($name) || !in_array($name, array_keys($appList))) {
+            return $this;
+        }
         return $this->autoMulti($map);
     }
     

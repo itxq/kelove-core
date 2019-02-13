@@ -48,7 +48,7 @@ class App extends \think\App
         if (count($appList) <= 1) {
             return $this;
         }
-        $name = strstr($this->request->path(), '/', true);
+        $name = current(explode('/', $this->request->path()));
         if (empty($name) || !in_array($name, array_keys($appList))) {
             return $this;
         }

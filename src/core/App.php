@@ -19,6 +19,8 @@ namespace kelove\core;
  */
 class App extends \think\App
 {
+    const VERSION = '1.0.0RC1';
+    
     /**
      * 运行根目录
      * @var string
@@ -36,24 +38,6 @@ class App extends \think\App
      * @var string
      */
     protected $rootConfigPath = '';
-    
-    /**
-     * 自动多应用访问
-     * @access public
-     * @param  array $appList 注册的应用列表
-     * @param  array $map 应用路由映射
-     * @return $this
-     */
-    public function autoMultiCheck(array $appList, array $map = []) {
-        if (count($appList) <= 1) {
-            return $this;
-        }
-        $name = current(explode('/', $this->request->path()));
-        if (empty($name) || !in_array($name, array_keys($appList))) {
-            return $this;
-        }
-        return $this->autoMulti($map);
-    }
     
     /**
      * 设置应用基础目录

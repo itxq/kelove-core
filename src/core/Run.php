@@ -61,21 +61,24 @@ class Run
      * @param array $config - 配置信息
      */
     protected function initialize(array $config = []): void {
+        ini_set('display_errors', 'Off');
         $this->scriptName = $this->getScriptName();
         $this->getBaseRoot();
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App($this->kelovePath);
-        $this->app->autoMultiCheck($this->appList, $this->autoMulti);
     }
     
     /**
      * 初始化应用
+     * @param bool $autoMulti 是否自动多应用
      * @param string $name 应用名称
      * @return App
      */
-    public function app(string $name = ''): App {
-        ini_set('display_errors', 'Off');
+    public function app(bool $autoMulti, string $name = ''): App {
+        if ($autoMulti) {
+            $this->app->autoMulti($this->autoMulti);
+        }
         $autoName = $this->app->getName();
         if (in_array($autoName, array_keys($this->appList))) {
             $name = $autoName;

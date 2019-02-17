@@ -89,13 +89,13 @@ class Run
         $this->app
             ->name($name)
             ->setBasePath($this->kelovePath)
-            ->setRootConfigPath($this->kelovePath . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setNamespace($namespace)
             ->path($path);
         if (is_dir($path . 'route')) {
-            $this->app->setRootRoutePath($path . DIRECTORY_SEPARATOR . 'route' . DIRECTORY_SEPARATOR);
+            $this->app->setRootRoutePath($path . 'route' . DIRECTORY_SEPARATOR);
         }
         return $this->app;
     }
@@ -159,10 +159,14 @@ class Run
     private function getBaseRoot(): void {
         if (!defined('BASE_ROOT')) {
             $scriptName = realpath($this->scriptName);
-            $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], Request::baseFile());
-            $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
-            $baseRoot = preg_replace($pattern, "$1", $scriptName);
-            $baseRoot = realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
+            if (strrpos(basename($scriptName), '.php') === false) {
+                $baseRoot = realpath(dirname($scriptName)) . DIRECTORY_SEPARATOR;
+            } else {
+                $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], Request::baseFile());
+                $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
+                $baseRoot = preg_replace($pattern, "$1", $scriptName);
+                $baseRoot = realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
+            }
             define('BASE_ROOT', $baseRoot);
         }
     }

@@ -36,11 +36,13 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "app\\" : "app",
-            "test\\": "test"
+            "app\\"          : "app",
+            "kelove\\admin\\": "admin",
+            "test\\"         : "test"
         },
         "files": [
-            "test/info.php"
+            "test/info.php",
+            "admin/info.php"
         ]
     },
     "extra"       : {

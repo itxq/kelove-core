@@ -1,10 +1,4 @@
 /.idea
 /vendor
-/test
-/config
-/app
-/public
-/runtime
 /composer.lock
 /kelove
-/admin

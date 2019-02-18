@@ -12,6 +12,7 @@
     "require"     : {
         "php"                 : ">=7.1.0",
         "ext-pdo"             : "*",
+        "ext-zip"             : "*",
         "ext-zlib"            : "*",
         "ext-curl"            : "*",
         "ext-json"            : "*",

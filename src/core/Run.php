@@ -92,10 +92,13 @@ class Run
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath('route' . DIRECTORY_SEPARATOR)
             ->setNamespace($namespace)
             ->path($path);
-        if (is_dir($path . 'route')) {
-            $this->app->setRootRoutePath($path . 'route' . DIRECTORY_SEPARATOR);
+        $appRoute = $path . 'route' . DIRECTORY_SEPARATOR;
+        $defaultRoute = BASE_ROOT . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
+        if (is_dir($appRoute) && !is_dir($defaultRoute)) {
+            File::make()->copyDir($appRoute, $defaultRoute);
         }
         return $this->app;
     }

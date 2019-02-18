@@ -70,6 +70,20 @@ class Run
     }
     
     /**
+     * 初始化控制台
+     * @return App
+     */
+    public function console(): App {
+        $this->app->setBasePath($this->kelovePath)
+            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath('route' . DIRECTORY_SEPARATOR)
+            ->multi(false);
+        return $this->app;
+    }
+    
+    /**
      * 初始化应用
      * @param bool $autoMulti 是否自动多应用
      * @param string $name 应用名称

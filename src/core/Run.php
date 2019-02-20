@@ -67,7 +67,7 @@ class Run
         $this->getBaseRoot();
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
-        $this->app = new App($this->kelovePath);
+        $this->app = new App(ROOT_PATH);
     }
     
     /**
@@ -76,7 +76,7 @@ class Run
      */
     public function console(): App
     {
-        $this->app->setBasePath($this->kelovePath)
+        $this->app
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
@@ -104,16 +104,15 @@ class Run
         $path = $appInfo['app_path'];
         $namespace = $appInfo['app_namespace'];
         $this->app
+            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath(ROOT_PATH . 'route' . DIRECTORY_SEPARATOR)
+            ->path($path)
             ->name($name)
-            ->setBasePath($this->kelovePath)
-            ->setRootConfigPath(BASE_ROOT . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRuntimePath(BASE_ROOT . 'runtime' . DIRECTORY_SEPARATOR)
-            ->setRootConfigPath(BASE_ROOT . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRoutePath(BASE_ROOT . 'route' . DIRECTORY_SEPARATOR)
-            ->setNamespace($namespace)
-            ->path($path);
+            ->setNamespace($namespace);
         $appRoute = $path . 'route' . DIRECTORY_SEPARATOR;
-        $defaultRoute = BASE_ROOT . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
+        $defaultRoute = ROOT_PATH . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
         if (is_dir($appRoute) && !is_dir($defaultRoute)) {
             File::make()->copyDir($appRoute, $defaultRoute);
         }
@@ -130,7 +129,7 @@ class Run
         // 获取注册的应用
         $appList = Event::trigger(self::APP_LIST_EVENT);
         // 获取app目录下的应用
-        $appPath = BASE_ROOT . 'app' . DIRECTORY_SEPARATOR;
+        $appPath = ROOT_PATH . 'app' . DIRECTORY_SEPARATOR;
         if (is_dir($appPath)) {
             $dir = get_sub_value('dir', File::make()->getDirs($appPath), []);
             foreach ($dir as $v) {
@@ -180,7 +179,7 @@ class Run
      */
     private function getBaseRoot(): void
     {
-        if (!defined('BASE_ROOT')) {
+        if (!defined('ROOT_PATH')) {
             $scriptName = realpath($this->scriptName);
             if (strrpos(basename($scriptName), '.php') === false) {
                 $baseRoot = realpath(dirname($scriptName)) . DIRECTORY_SEPARATOR;
@@ -190,7 +189,7 @@ class Run
                 $baseRoot = preg_replace($pattern, "$1", $scriptName);
                 $baseRoot = realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
             }
-            define('BASE_ROOT', $baseRoot);
+            define('ROOT_PATH', $baseRoot);
         }
     }
     

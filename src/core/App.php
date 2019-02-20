@@ -141,7 +141,7 @@ class App extends \think\App
     protected function setDependPath(): void
     {
         // 获取根目录
-        $baseRoot = BASE_ROOT;
+        $baseRoot = ROOT_PATH;
         if (!$this->appPath) {
             $this->appPath = $baseRoot . 'app' . ($this->multi ? DIRECTORY_SEPARATOR . $this->name : '') . DIRECTORY_SEPARATOR;
         }

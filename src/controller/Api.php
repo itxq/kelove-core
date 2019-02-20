@@ -67,7 +67,8 @@ abstract class Api extends Base
     /**
      * 初始化
      */
-    protected function initialize() {
+    protected function initialize()
+    {
         // 获取当前操作名
         $action = strtolower($this->request->action());
         // 允许直接访问的接口
@@ -100,7 +101,8 @@ abstract class Api extends Base
      * 创建AccessToken
      * @return array[0=>'未加密的token信息',1=>'加密后的token信息']
      */
-    protected function createAccessToken(): array {
+    protected function createAccessToken(): array
+    {
         if (empty($accessToken)) {
             $accessToken = sha1(md5(uniqid(md5(microtime(true)), true)));
         }
@@ -118,7 +120,8 @@ abstract class Api extends Base
      * @param array $header - 发送的Header信息
      * @return bool
      */
-    protected function apiResult(int $code = 0, string $msg = '', $data = [], string $type = 'json', array $header = []) {
+    protected function apiResult(int $code = 0, string $msg = '', $data = [], string $type = 'json', array $header = [])
+    {
         $type = empty($type) ? $this->resultType : $type;
         $this->result($data, $code, $msg, $type, $header);
         return false;
@@ -129,7 +132,8 @@ abstract class Api extends Base
      * @param array $accessToken - Token明文
      * @return string - 输出密文
      */
-    protected function encryptAccessToken(array $accessToken): string {
+    protected function encryptAccessToken(array $accessToken): string
+    {
         return strval(base64_encode(json_encode($accessToken)));
     }
     
@@ -138,7 +142,8 @@ abstract class Api extends Base
      * @param string $accessToken - Token密文
      * @return array
      */
-    protected function decryptAccessToken(string $accessToken): array {
+    protected function decryptAccessToken(string $accessToken): array
+    {
         return (array)json_decode(base64_decode($accessToken), true);
     }
     
@@ -149,13 +154,16 @@ abstract class Api extends Base
      * @param mixed $default - 指定默认值
      * @return mixed
      */
-    protected function getSubValue($name, $data, $default = '') {
+    protected function getSubValue($name, $data, $default = '')
+    {
         if (is_object($data)) {
             $value = isset($data->$name) ? $data->$name : $default;
-        } else if (is_array($data)) {
-            $value = isset($data[$name]) ? $data[$name] : $default;
         } else {
-            $value = $default;
+            if (is_array($data)) {
+                $value = isset($data[$name]) ? $data[$name] : $default;
+            } else {
+                $value = $default;
+            }
         }
         return $value;
     }
@@ -164,7 +172,8 @@ abstract class Api extends Base
      * AccessToken验证成功后的回调处理
      * @return bool
      */
-    protected function checkAccessTokenCallBack(): bool {
+    protected function checkAccessTokenCallBack(): bool
+    {
         return true;
     }
     
@@ -174,19 +183,22 @@ abstract class Api extends Base
      * @param string $type - 检查类型GET/POST
      * @return bool
      */
-    private function methodCheck(string $action, $type = self::POST): bool {
+    private function methodCheck(string $action, $type = self::POST): bool
+    {
         if ($type === self::POST) {
             if (in_array($action, array_map('strtolower', $this->postAction)) && !$this->request->isPost()) {
                 return $this->apiResult(-2, '请求方式错误 必须为POST', [], $this->resultType, []);
             }
             return true;
-        } else if ($type === self::GET) {
-            if (in_array($action, array_map('strtolower', $this->getAction)) && !$this->request->isGet()) {
-                return $this->apiResult(-2, '请求方式错误 必须为GET', [], $this->resultType, []);
-            }
-            return true;
         } else {
-            return false;
+            if ($type === self::GET) {
+                if (in_array($action, array_map('strtolower', $this->getAction)) && !$this->request->isGet()) {
+                    return $this->apiResult(-2, '请求方式错误 必须为GET', [], $this->resultType, []);
+                }
+                return true;
+            } else {
+                return false;
+            }
         }
     }
     
@@ -194,7 +206,8 @@ abstract class Api extends Base
      * 检查AccessToken
      * @return bool
      */
-    private function checkAccessToken(): bool {
+    private function checkAccessToken(): bool
+    {
         $tokenInfo = $this->getAccessTokenInfo($this->accessToken);
         $createTime = intval($this->getSubValue('create_time', $tokenInfo, 0));
         $expiresIn = intval($this->getSubValue('expires_in', $tokenInfo, 0));
@@ -217,7 +230,8 @@ abstract class Api extends Base
      * 获取请求参数中的AccessToken，并解密为数组
      * @return bool
      */
-    private function getRequestAccessToken(): bool {
+    private function getRequestAccessToken(): bool
+    {
         // 获取header中的token参数
         $accessToken = urldecode(trim(strip_tags($this->request->header('access-token', ''))));
         if (empty($accessToken)) {

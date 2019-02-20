@@ -28,7 +28,8 @@ class File
      * @param $dir -目录名
      * @return boolean true 成功， false 失败
      */
-    public function mkDir(string $dir): bool {
+    public function mkDir(string $dir): bool
+    {
         $dir = rtrim($dir, '/') . '/';
         if (is_dir($dir)) {
             return true;
@@ -43,7 +44,8 @@ class File
      * @param string $openMod - 打开方式
      * @return bool - true 成功false 失败
      */
-    public function writeFile($filename, $writeText, $openMod = 'w'): bool {
+    public function writeFile($filename, $writeText, $openMod = 'w'): bool
+    {
         if (@$fp = fopen($filename, $openMod)) {
             flock($fp, 2);
             fwrite($fp, $writeText);
@@ -59,7 +61,8 @@ class File
      * @param string $dirName -原目录
      * @return boolean true 成功, false 失败
      */
-    public function delDir(string $dirName): bool {
+    public function delDir(string $dirName): bool
+    {
         if (!file_exists($dirName)) {
             return false;
         }
@@ -85,7 +88,8 @@ class File
      * @param string $toDir - 目标目录
      * @return boolean true 成功, false 失败
      */
-    public function copyDir(string $surDir, string $toDir): bool {
+    public function copyDir(string $surDir, string $toDir): bool
+    {
         $surDir = rtrim($surDir, '/') . '/';
         $toDir = rtrim($toDir, '/') . '/';
         if (!file_exists($surDir)) {
@@ -117,7 +121,8 @@ class File
      * @param bool $isDel - 是否删除当前目录和上级目录（. or ..）
      * @return array - 目录数组。列出文件夹下内容，返回数组 $dirArray['dir']:存文件夹；$dirArray['file']：存文件
      */
-    public function getDirs(string $dir, bool $isDel = true): array {
+    public function getDirs(string $dir, bool $isDel = true): array
+    {
         $dir = rtrim($dir, '/') . '/';
         $dirArray = [];
         if (false != ($handle = opendir($dir))) {
@@ -151,7 +156,8 @@ class File
      * @param array $list - 无需赋值
      * @return array
      */
-    public function getFiles(string $dir, bool $isList = false, array $list = []): array {
+    public function getFiles(string $dir, bool $isList = false, array $list = []): array
+    {
         $data = [];
         $dir = realpath($dir);
         if (!is_dir($dir)) {
@@ -181,7 +187,8 @@ class File
      * @param string $dir - 目录名
      * @return number 文件夹大小(单位 B)
      */
-    public function getSize(string $dir) {
+    public function getSize(string $dir)
+    {
         $dirList = opendir($dir);
         $dirSize = 0;
         while (false !== ($folderOrFile = readdir($dirList))) {
@@ -202,7 +209,8 @@ class File
      * @param string $dir - 目录名
      * @return boolean - true 空， false 不为空
      */
-    public function emptyDir(string $dir): bool {
+    public function emptyDir(string $dir): bool
+    {
         return (($files = @scandir($dir)) && count($files) <= 2);
     }
     
@@ -214,7 +222,12 @@ class File
      * @param bool $overWrite - 是否覆盖已有文件(true-覆盖|false-不覆盖|string-以该字符串命名目录)
      * @return bool
      */
-    public function unzip(string $zipFile, string $unzipDir = './', bool $mkNameDir = false, bool $overWrite = false): bool {
+    public function unzip(
+        string $zipFile,
+        string $unzipDir = './',
+        bool $mkNameDir = false,
+        bool $overWrite = false
+    ): bool {
         // 获取压缩文件全路径
         $zipFile = realpath($zipFile);
         if (!is_file($zipFile)) {

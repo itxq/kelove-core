@@ -30,7 +30,8 @@ class Upload
      * @param string $extension - 扩展名（为空自动获取）
      * @return bool|string
      */
-    public function imgTurnBase64(string $url, string $extension = '') {
+    public function imgTurnBase64(string $url, string $extension = '')
+    {
         try {
             $extension = empty($extension) ? pathinfo($url, PATHINFO_EXTENSION) : $extension;
             $file = file_get_contents($url);
@@ -51,7 +52,8 @@ class Upload
      * @param string $saveName - 保存文件名
      * @return bool
      */
-    public function saveBase64Img(string $base64Img, string $savePath, string $saveName): bool {
+    public function saveBase64Img(string $base64Img, string $savePath, string $saveName): bool
+    {
         if (empty($base64Img)) {
             $this->message = '请选择要上传的图片';
             return false;
@@ -76,7 +78,8 @@ class Upload
      * @param array $config - 上传配置['size'=>1023,'ext'=>'png,jpg']
      * @return bool|string
      */
-    public function getRemoteFile(string $url, string $savePath = '', string $saveName = '', $config = []) {
+    public function getRemoteFile(string $url, string $savePath = '', string $saveName = '', $config = [])
+    {
         $imgUrl = str_replace("&amp;", "&", htmlspecialchars($url));
         //http开头验证
         if (strpos($imgUrl, "http") !== 0) {
@@ -155,7 +158,8 @@ class Upload
      * @param $height - 高
      * @return bool
      */
-    public function thumb(string $tempDir, string $saveDir, string $saveName, int $width = 100, int $height = 100): bool {
+    public function thumb(string $tempDir, string $saveDir, string $saveName, int $width = 100, int $height = 100): bool
+    {
         if (!is_dir($saveDir)) {
             if (!mkdir($saveDir, 0700, true)) {
                 $this->message = '创建文件保存目录失败';
@@ -181,7 +185,8 @@ class Upload
      * @param $extension - 文件扩展名
      * @return bool
      */
-    private function saveImg(string $content, string $savePath, string $saveName, string $extension): bool {
+    private function saveImg(string $content, string $savePath, string $saveName, string $extension): bool
+    {
         /* 创建目录 */
         if (!is_dir($savePath)) {
             if (!mkdir($savePath, 0700, true)) {

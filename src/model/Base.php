@@ -50,7 +50,8 @@ abstract class Base extends Model
      * 静态调用
      * @return static
      */
-    public static function make() {
+    public static function make()
+    {
         return new static();
     }
     
@@ -63,7 +64,13 @@ abstract class Base extends Model
      * @param string $idList 记录id列表,无需赋值
      * @return string
      */
-    public function getSonIds(int $id = 0, string $pidName = 'pid', int $loopTimes = 0, int $countNum = 0, string $idList = '') {
+    public function getSonIds(
+        int $id = 0,
+        string $pidName = 'pid',
+        int $loopTimes = 0,
+        int $countNum = 0,
+        string $idList = ''
+    ) {
         /* 初始化 id 字符串列表 （首先把当前分类加入列表）*/
         $idList .= empty($idList) ? strval($id) : '';
         $where = [[$pidName, 'EQ', intval($id)], ['status', 'EQ', 1]];

@@ -38,7 +38,8 @@ trait SingleModelTrait
      * SingleModelTrait 构造函数. 禁止直接实例化该类
      * @param array $config - 配置信息
      */
-    protected function __construct(array $config = []) {
+    protected function __construct(array $config = [])
+    {
         $this->config = array_merge($this->config, $config);
         $this->initialize($this->config);
     }
@@ -47,7 +48,8 @@ trait SingleModelTrait
      * 初始化加载
      * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void {
+    protected function initialize(array $config = []): void
+    {
     }
     
     /**
@@ -56,7 +58,8 @@ trait SingleModelTrait
      * @param bool $force - 是否强制重新实例化
      * @return static
      */
-    public static function make(array $config = [], bool $force = false) {
+    public static function make(array $config = [], bool $force = false)
+    {
         $className = get_called_class();
         if (!isset(self::$instances[$className]) || !self::$instances[$className] instanceof $className || $force === true) {
             $instance = new $className($config);
@@ -69,7 +72,8 @@ trait SingleModelTrait
      * 获取反馈信息
      * @return mixed
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
     
@@ -77,7 +81,8 @@ trait SingleModelTrait
      * 克隆防止继承
      * @return bool
      */
-    final private function __clone() {
+    final private function __clone()
+    {
         return false;
     }
 }

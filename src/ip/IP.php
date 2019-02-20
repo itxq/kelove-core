@@ -64,7 +64,8 @@ class IP
      * @param string $path - IP数据库文件路径
      * @return IP
      */
-    public function lookup(string $ip, string $path = ''): IP {
+    public function lookup(string $ip, string $path = ''): IP
+    {
         if (empty($path)) {
             $path = realpath(__DIR__ . '/data/qqwry.dat');
         }
@@ -143,7 +144,8 @@ class IP
      * @param string $type - 获取类型
      * @return array|mixed
      */
-    public function get(string $type = self::LOCATION) {
+    public function get(string $type = self::LOCATION)
+    {
         if ($type === self::LOCATION && count($this->ipInfo) === 4) {
             return $this->ipInfo;
         }
@@ -154,7 +156,8 @@ class IP
      * 初始化
      * @param string $path
      */
-    protected function ini(string $path): void {
+    protected function ini(string $path): void
+    {
         $this->fh = fopen($path, 'rb');
         $this->first = $this->getLong4();
         $this->last = $this->getLong4();
@@ -165,7 +168,8 @@ class IP
      * 查询地区信息
      * @return string
      */
-    protected function getArea(): string {
+    protected function getArea(): string
+    {
         $byte = fread($this->fh, 1); //标志字节
         switch (ord($byte)) {
             case 0:
@@ -191,7 +195,8 @@ class IP
      * @param string $ip
      * @return bool
      */
-    protected function checkIp(string $ip): bool {
+    protected function checkIp(string $ip): bool
+    {
         $arr = explode('.', $ip);
         if (count($arr) != 4) {
             return false;
@@ -210,7 +215,8 @@ class IP
      * @param string $data
      * @return string
      */
-    protected function getInfo(string $data = ''): string {
+    protected function getInfo(string $data = ''): string
+    {
         $char = fread($this->fh, 1);
         while (ord($char) != 0) { //国家地区信息以0结束
             $data .= $char;
@@ -219,13 +225,15 @@ class IP
         return $data;
     }
     
-    protected function getLong4() {
+    protected function getLong4()
+    {
         //读取little-endian编码的4个字节转化为长整型数
         $result = unpack('Vlong', fread($this->fh, 4));
         return $result['long'];
     }
     
-    protected function getLong3() {
+    protected function getLong3()
+    {
         //读取little-endian编码的3个字节转化为长整型数
         $result = unpack('Vlong', fread($this->fh, 3) . chr(0));
         return $result['long'];
@@ -234,7 +242,8 @@ class IP
     /**
      * 析构函数
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         @fclose($this->fh);
     }
 }

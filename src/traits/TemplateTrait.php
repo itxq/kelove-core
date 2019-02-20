@@ -29,7 +29,8 @@ trait TemplateTrait
      * @param string $suffix - 模板后缀
      * @return array
      */
-    protected function getTemplate(string $name = '', string $path = '', string $suffix = ''): array {
+    protected function getTemplate(string $name = '', string $path = '', string $suffix = ''): array
+    {
         $name = empty($name) ? 'default' : $name;
         $suffix = empty($suffix) ? '.' . config('url_html_suffix') : $suffix;
         $path = empty($path) ? Env::get('base_root') . 'template' . DIRECTORY_SEPARATOR : realpath($path);

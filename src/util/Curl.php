@@ -33,7 +33,8 @@ class Curl
      * 初始化加载
      * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void {
+    protected function initialize(array $config = []): void
+    {
         $this->curl = new Client($config);
     }
     
@@ -44,7 +45,8 @@ class Curl
      * @param string $ext - 指定文件扩展名
      * @return bool|string - 成功返回下载文件的保存路径，失败返回false
      */
-    public function curlDownload(string $url, string $path = './curl-download', string $ext = '') {
+    public function curlDownload(string $url, string $path = './curl-download', string $ext = '')
+    {
         set_time_limit(0);
         if (empty($ext)) {
             $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));

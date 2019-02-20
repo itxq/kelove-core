@@ -42,7 +42,8 @@ class PinYin
      * 初始化加载
      * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void {
+    protected function initialize(array $config = []): void
+    {
         if (isset($config['keys']) && !empty($config['keys'])) {
             $this->keys = $config['keys'];
         }
@@ -62,7 +63,8 @@ class PinYin
      * @param string $charset 文字编码
      * @return string
      */
-    public function turn(string $chinese, bool $ucFirst = false, $delimiter = '', $charset = 'utf-8') {
+    public function turn(string $chinese, bool $ucFirst = false, $delimiter = '', $charset = 'utf-8')
+    {
         $check = preg_match('/^[\-\_a-zA-Z0-9\.]+$/', $chinese, $match);
         if ($check) {
             $result = $chinese;
@@ -107,7 +109,8 @@ class PinYin
      * @param $data
      * @return int|string
      */
-    protected function turnPinYin($num, $data) {
+    protected function turnPinYin($num, $data)
+    {
         if ($num > 0 && $num < 160) {
             return chr($num);
         } elseif ($num < -20319 || $num > -10247) {
@@ -115,8 +118,9 @@ class PinYin
         } else {
             $k = '';
             foreach ($data as $k => $v) {
-                if ($v <= $num)
+                if ($v <= $num) {
                     break;
+                }
             }
             return $k;
         }
@@ -127,7 +131,8 @@ class PinYin
      * @param $c
      * @return string
      */
-    protected function turnGBK($c) {
+    protected function turnGBK($c)
+    {
         return iconv('UTF-8', 'GBK//IGNORE', $c);
     }
 }

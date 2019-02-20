@@ -11,6 +11,7 @@
     ],
     "require"     : {
         "php"                 : ">=7.1.0",
+        "ext-openssl"         : "*",
         "ext-pdo"             : "*",
         "ext-zip"             : "*",
         "ext-zlib"            : "*",

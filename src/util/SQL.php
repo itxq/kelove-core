@@ -30,7 +30,8 @@ class SQL
      *         这种前缀替换方法不一定准确，比如正常内容内有跟前缀相同的字符，也会被替换
      * @return array
      */
-    public function getSqlFromFile(string $sqlFile = '', array $replace = []): array {
+    public function getSqlFromFile(string $sqlFile = '', array $replace = []): array
+    {
         if (!is_file($sqlFile)) {
             return [];
         }
@@ -50,7 +51,8 @@ class SQL
      * @param array $replace 替换前缀，如：['my_' => 'me_']，表示将表前缀my_替换成me_
      * @return array 除去注释之后的sql语句数组
      */
-    public function parseSql(string $content = '', array $replace = []): array {
+    public function parseSql(string $content = '', array $replace = []): array
+    {
         if (empty($content)) {
             return [];
         }

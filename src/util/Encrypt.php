@@ -45,7 +45,8 @@ class Encrypt
      * @param string $key - 密钥（可选，默认为：kelove_encrypt_key）
      * @return string - 输出密文
      */
-    public function encrypt(string $code, int $term = 0, string $key = 'kelove_encrypt_key'): string {
+    public function encrypt(string $code, int $term = 0, string $key = 'kelove_encrypt_key'): string
+    {
         $this->time = $term;
         $this->key = $key;
         // 获取密钥a和密钥b
@@ -71,7 +72,8 @@ class Encrypt
      * @param string $key - 密钥（加密时使用的密钥）
      * @return string - 输出明文
      */
-    public function decrypt(string $code, string $key = 'kelove_encrypt_key'):string {
+    public function decrypt(string $code, string $key = 'kelove_encrypt_key'): string
+    {
         $this->key = $key;
         $search = ['%25', '', '%2B', '%2F', '%26', '%23', '%3F', '%20'];
         $replace = ['%', '=', '+', '/', '&', '#', '?', ' '];
@@ -90,7 +92,8 @@ class Encrypt
         // substr($result, 0, 10) - time() > 0 验证数据有效性
         // substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16) 验证数据完整性
         // 验证数据有效性，请看未加密明文的格式
-        if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10, 16) == substr(md5(substr($result, 26) . $keys['b']), 0, 16)) {
+        if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10,
+                16) == substr(md5(substr($result, 26) . $keys['b']), 0, 16)) {
             $result = substr($result, 26);
             return $result;
         } else {
@@ -102,7 +105,8 @@ class Encrypt
      * 密钥初始设置
      * @return array - 密钥数组
      */
-    protected function setKeys(): array {
+    protected function setKeys(): array
+    {
         $key = $this->key;
         $keys = [];
         $key = md5($key);
@@ -121,7 +125,8 @@ class Encrypt
      * @param int $codeLength - 明文/密文长度
      * @return string - 返回核心加密/解密结果
      */
-    protected function core(string $encryptKey, int $keyLength, string $code, int $codeLength): string {
+    protected function core(string $encryptKey, int $keyLength, string $code, int $codeLength): string
+    {
         $result = '';
         $box = range(0, 255);
         $rndKey = [];

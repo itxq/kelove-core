@@ -60,7 +60,8 @@ class Run
      * 初始化加载
      * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void {
+    protected function initialize(array $config = []): void
+    {
         ini_set('display_errors', 'Off');
         $this->scriptName = $this->getScriptName();
         $this->getBaseRoot();
@@ -73,7 +74,8 @@ class Run
      * 初始化控制台
      * @return App
      */
-    public function console(): App {
+    public function console(): App
+    {
         $this->app->setBasePath($this->kelovePath)
             ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
             ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
@@ -89,7 +91,8 @@ class Run
      * @param string $name 应用名称
      * @return App
      */
-    public function app(bool $autoMulti, string $name = ''): App {
+    public function app(bool $autoMulti, string $name = ''): App
+    {
         if ($autoMulti) {
             $this->app->autoMulti($this->autoMulti);
         }
@@ -121,7 +124,8 @@ class Run
      * 获取全部应用列表
      * @return mixed
      */
-    private function getAppList() {
+    private function getAppList()
+    {
         $list = [];
         // 获取注册的应用
         $appList = Event::trigger(self::APP_LIST_EVENT);
@@ -157,7 +161,8 @@ class Run
      * @param array $info
      * @return bool
      */
-    private function appInfoCheck(array $info): bool {
+    private function appInfoCheck(array $info): bool
+    {
         if (
             !isset($info['app_name']) ||
             !isset($info['app_title']) ||
@@ -173,7 +178,8 @@ class Run
     /**
      * 获取根目录
      */
-    private function getBaseRoot(): void {
+    private function getBaseRoot(): void
+    {
         if (!defined('BASE_ROOT')) {
             $scriptName = realpath($this->scriptName);
             if (strrpos(basename($scriptName), '.php') === false) {
@@ -192,7 +198,8 @@ class Run
      * 获取入口文件路径
      * @return string
      */
-    private function getScriptName(): string {
+    private function getScriptName(): string
+    {
         return 'cli' == PHP_SAPI ? realpath($_SERVER['argv'][0]) : $_SERVER['SCRIPT_FILENAME'];
     }
 }

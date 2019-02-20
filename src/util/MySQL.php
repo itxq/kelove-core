@@ -84,9 +84,10 @@ class MySQL
      * 初始化加载
      * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void {
+    protected function initialize(array $config = []): void
+    {
         $this->file = get_sub_value('file', $config, []);
-        $this->database = array_merge((array)Config::pull('database'), get_sub_value('database', $config, []));
+        $this->database = get_sub_value('database', $config, []);
         $this->db = \think\facade\Db::connect($this->database);
     }
     
@@ -94,7 +95,8 @@ class MySQL
      * 写入初始数据
      * @return int|bool
      */
-    public function create() {
+    public function create()
+    {
         $sql = "-- -----------------------------$this->eol";
         $sql .= "-- MySQL Data Transfer$this->eol";
         $sql .= "--$this->eol";
@@ -115,7 +117,8 @@ class MySQL
      * @param int $start
      * @return bool
      */
-    public function backupAll(array $tables, int $start = 0): bool {
+    public function backupAll(array $tables, int $start = 0): bool
+    {
         // 备份指定表
         foreach ($tables as $table) {
             $start = $this->backup($table, $start);
@@ -135,7 +138,8 @@ class MySQL
      * @param array $infoList - 多个数据文件列表
      * @return bool
      */
-    public function importAll(array $infoList): bool {
+    public function importAll(array $infoList): bool
+    {
         foreach ($infoList as $k => $v) {
             $this->file[1] = $v['path'];
             $this->config['compress'] = isset($v['compress']) ? $v['compress'] : false;
@@ -160,7 +164,8 @@ class MySQL
      * @param bool $exportData 是否导出数据
      * @return bool
      */
-    public function export(array $tables = [], string $path = '', string $prefix = '', bool $exportData = true) {
+    public function export(array $tables = [], string $path = '', string $prefix = '', bool $exportData = true)
+    {
         $datetime = date('Y-m-d H:i:s', time());
         $sql = "-- -----------------------------$this->eol";
         $sql .= "-- 导出时间 `{$datetime}`$this->eol";
@@ -186,7 +191,8 @@ class MySQL
      * @param string $prefix 表前缀
      * @return bool
      */
-    public function exportUninstall(array $tables = [], string $path = '', string $prefix = ''): bool {
+    public function exportUninstall(array $tables = [], string $path = '', string $prefix = ''): bool
+    {
         $datetime = date('Y-m-d H:i:s', time());
         $sql = "-- -----------------------------$this->eol";
         $sql .= "-- 导出时间 `{$datetime}`$this->eol";
@@ -212,7 +218,8 @@ class MySQL
      * @param int $start 起始行数
      * @return string
      */
-    public function getSql(string $table, bool $exportData = false, int $start = 0): string {
+    public function getSql(string $table, bool $exportData = false, int $start = 0): string
+    {
         $sql = "";
         if ($this->db->query("SHOW TABLES LIKE '%{$table}%'")) {
             
@@ -239,7 +246,8 @@ class MySQL
                 // 备份数据记录
                 $result = $this->db->query("SELECT * FROM `{$table}` LIMIT {$start}, 1000");
                 foreach ($result as $row) {
-                    $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'], $this->getInsertValue($row)) . ");$this->eol";
+                    $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'],
+                            $this->getInsertValue($row)) . ");$this->eol";
                 }
                 
                 // 还有更多数据
@@ -258,7 +266,8 @@ class MySQL
      * @param int $start 起始行数
      * @return array|bool|int  false - 备份失败
      */
-    protected function backup(string $table, int $start = 0) {
+    protected function backup(string $table, int $start = 0)
+    {
         // 备份表结构
         if (0 == $start) {
             $result = $this->db->query("SHOW CREATE TABLE `{$table}`");
@@ -292,7 +301,8 @@ class MySQL
             // 备份数据记录
             $result = $this->db->query("SELECT * FROM `{$table}` LIMIT {$start}, 1000");
             foreach ($result as $k => $row) {
-                $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'], $this->getInsertValue($row)) . ");$this->eol";
+                $sql = "INSERT INTO `{$table}` VALUES (" . str_replace(["\r", "\n", "\r\n"], ['\r', '\n', '\r\n'],
+                        $this->getInsertValue($row)) . ");$this->eol";
                 if (false === $this->write($sql)) {
                     return false;
                 }
@@ -313,14 +323,17 @@ class MySQL
      * @param $row
      * @return string
      */
-    protected function getInsertValue(array $row): string {
+    protected function getInsertValue(array $row): string
+    {
         foreach ($row as $k => $v) {
             if (is_numeric($v) && (substr($v, 0, 1) != 0 || strlen($v) == 1)) {
                 $row[$k] = $v;
-            } else if (is_null($v)) {
-                $row[$k] = 'null';
             } else {
-                $row[$k] = "'" . addslashes($v) . "'";
+                if (is_null($v)) {
+                    $row[$k] = 'null';
+                } else {
+                    $row[$k] = "'" . addslashes($v) . "'";
+                }
             }
         }
         return implode(',', $row);
@@ -331,7 +344,8 @@ class MySQL
      * @param int $start 起始位置
      * @return array|bool|int
      */
-    protected function import(int $start = 0) {
+    protected function import(int $start = 0)
+    {
         if ($this->config['compress']) {
             $gz = gzopen($this->file[1], 'r');
             $size = 0;
@@ -366,7 +380,8 @@ class MySQL
      * 打开一个卷，用于写入数据
      * @param int $size 写入数据的大小
      */
-    protected function open(int $size = 0): void {
+    protected function open(int $size = 0): void
+    {
         if ($this->fp) {
             $this->size += $size;
             if ($this->size > $this->config['part']) {
@@ -394,7 +409,8 @@ class MySQL
      * @param string $sql 要写入的SQL语句
      * @return int|bool
      */
-    protected function write(string $sql = '') {
+    protected function write(string $sql = '')
+    {
         $size = strlen($sql);
         
         // 由于压缩原因，无法计算出压缩后的长度，这里假设压缩率为50%，
@@ -409,11 +425,13 @@ class MySQL
      * 获取数据库中所有表名
      * @return array
      */
-    public function getTables(): array {
+    public function getTables(): array
+    {
         try {
             $tables = [];
             $tableInfo = $this->db
-                ->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . get_sub_value('database', $this->database, '') . '\'');
+                ->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . get_sub_value('database',
+                        $this->database, '') . '\'');
             foreach ($tableInfo as $k => $v) {
                 $tables[] = is_array($v) ? array_values($v)[0] : $v;
             }
@@ -426,7 +444,8 @@ class MySQL
     /**
      * 析构方法，用于关闭文件资源
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->config['compress'] ? @gzclose($this->fp) : @fclose($this->fp);
     }
 }

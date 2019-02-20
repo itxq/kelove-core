@@ -29,7 +29,8 @@ class Rsa
      * @param string $privateKey - 私钥
      * @return string - 签名
      */
-    public function sign(string $data, string $privateKey): string {
+    public function sign(string $data, string $privateKey): string
+    {
         $privateKey = $this->getPrivateKey($privateKey);
         openssl_sign($data, $sign, $privateKey);
         openssl_free_key($privateKey);
@@ -43,7 +44,8 @@ class Rsa
      * @param string $publicKey - 公钥
      * @return bool
      */
-    public function checkSign(string $data, string $sign, string $publicKey): bool {
+    public function checkSign(string $data, string $sign, string $publicKey): bool
+    {
         $publicKey = $this->getPublicKey($publicKey);
         $sign = base64_decode($sign);
         return (bool)openssl_verify($data, $sign, $publicKey);
@@ -55,7 +57,8 @@ class Rsa
      * @param string $publicKey - 公钥
      * @return bool|string 解密失败返回false ，成功返回解密内容
      */
-    public function encrypt(string $data, string $publicKey): string {
+    public function encrypt(string $data, string $publicKey): string
+    {
         $data = str_split($data, 117);
         $key = $this->getPublicKey($publicKey);
         $encrypt = '';
@@ -72,7 +75,8 @@ class Rsa
      * @param string $privateKey - 私钥
      * @return bool|string 解密失败返回false ，成功返回解密内容
      */
-    public function decrypt(string $data, string $privateKey): string {
+    public function decrypt(string $data, string $privateKey): string
+    {
         // 解密原始数据
         $data = base64_decode($data);
         // 获得私钥
@@ -92,7 +96,8 @@ class Rsa
      * @param string $privateKey - 私钥文件路径/私钥字符串
      * @return bool|resource|string
      */
-    protected function getPrivateKey(string $privateKey) {
+    protected function getPrivateKey(string $privateKey)
+    {
         //读取私钥
         $path = realpath($privateKey);
         if (is_file($path)) {
@@ -111,7 +116,8 @@ class Rsa
      * @param string $publicKey - 公钥文件路径/公钥字符串
      * @return bool|resource|string
      */
-    protected function getPublicKey(string $publicKey) {
+    protected function getPublicKey(string $publicKey)
+    {
         // 获取公匙
         $path = realpath($publicKey);
         if (is_file($path)) {

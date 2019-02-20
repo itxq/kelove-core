@@ -44,7 +44,8 @@ class App extends \think\App
      * @param string $path 应用基础目录
      * @return $this
      */
-    public function setBasePath(string $path) {
+    public function setBasePath(string $path)
+    {
         $path = $this->createDir($path);
         if ($path) {
             $this->basePath = $path;
@@ -58,7 +59,8 @@ class App extends \think\App
      * @param string $path 运行根目录
      * @return $this
      */
-    public function setRootRuntimePath(string $path) {
+    public function setRootRuntimePath(string $path)
+    {
         $path = $this->createDir($path);
         if ($path) {
             $this->rootRuntimePath = $path;
@@ -72,7 +74,8 @@ class App extends \think\App
      * @param string $path 路由根目录
      * @return $this
      */
-    public function setRootRoutePath(string $path) {
+    public function setRootRoutePath(string $path)
+    {
         $path = $this->createDir($path);
         if ($path) {
             $this->rootRoutePath = $path;
@@ -86,7 +89,8 @@ class App extends \think\App
      * @param string $path
      * @return $this
      */
-    public function setRootConfigPath(string $path) {
+    public function setRootConfigPath(string $path)
+    {
         $path = $this->createDir($path);
         if ($path) {
             $this->rootConfigPath = $path;
@@ -100,10 +104,12 @@ class App extends \think\App
      * @param string $baseRoot
      * @return void
      */
-    protected function setCustomDependPath(string $baseRoot): void {
+    protected function setCustomDependPath(string $baseRoot): void
+    {
         // 自定义运行目录
         if (!empty($this->rootRuntimePath)) {
-            $this->runtimePath = str_replace($this->rootPath . 'runtime', realpath($this->rootRuntimePath), $this->runtimePath);
+            $this->runtimePath = str_replace($this->rootPath . 'runtime', realpath($this->rootRuntimePath),
+                $this->runtimePath);
             $this->env->set(['runtime_path' => $this->runtimePath]);
         }
         // 自定义路由目录
@@ -114,7 +120,8 @@ class App extends \think\App
         }
         // 自定义配置目录
         if (!empty($this->rootConfigPath)) {
-            $this->configPath = str_replace($this->rootPath . 'config', realpath($this->rootConfigPath), $this->configPath);
+            $this->configPath = str_replace($this->rootPath . 'config', realpath($this->rootConfigPath),
+                $this->configPath);
             $this->env->set(['config_path' => $this->configPath]);
         }
         
@@ -131,7 +138,8 @@ class App extends \think\App
      * @access protected
      * @return void
      */
-    protected function setDependPath(): void {
+    protected function setDependPath(): void
+    {
         // 获取根目录
         $baseRoot = BASE_ROOT;
         if (!$this->appPath) {
@@ -146,7 +154,8 @@ class App extends \think\App
      * @param string $path 路径
      * @return bool|string
      */
-    protected function createDir(string $path) {
+    protected function createDir(string $path)
+    {
         if (is_dir($path)) {
             return realpath($path) . DIRECTORY_SEPARATOR;
         }

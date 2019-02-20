@@ -47,7 +47,8 @@ class Tree
      * @param int $curLevel 当前层数
      * @return array
      */
-    public function toLayer(array $lists = [], int $pid = 0, int $maxLevel = 0, int $curLevel = 0): array {
+    public function toLayer(array $lists = [], int $pid = 0, int $maxLevel = 0, int $curLevel = 0): array
+    {
         $trees = [];
         $lists = array_values($lists);
         foreach ($lists as $key => $value) {
@@ -74,7 +75,8 @@ class Tree
      * @param  array $parent 父级信息(自动生成，无需赋值)
      * @return array 列表结构(一维数组)
      */
-    public function toList(array $lists = [], int $pid = 0, int $level = 0, array $parent = []): array {
+    public function toList(array $lists = [], int $pid = 0, int $level = 0, array $parent = []): array
+    {
         $trees = [];
         foreach ($lists as $key => $value) {
             if ($value[$this->config['pid']] == $pid) {
@@ -102,7 +104,8 @@ class Tree
      * @param  int $id 子节点id
      * @return array
      */
-    public function getParents(array $lists = [], int $id = 0): array {
+    public function getParents(array $lists = [], int $id = 0): array
+    {
         $trees = [];
         foreach ($lists as $value) {
             if ($value[$this->config['id']] == $id) {
@@ -119,7 +122,8 @@ class Tree
      * @param  int $pid 父级id
      * @return array
      */
-    public function getChildrenIds(array $lists = [], int $pid = 0): array {
+    public function getChildrenIds(array $lists = [], int $pid = 0): array
+    {
         $result = [];
         foreach ($lists as $value) {
             if ($value[$this->config['pid']] == $pid) {
@@ -136,7 +140,8 @@ class Tree
      * @param  int $pid 父级id
      * @return array
      */
-    public function getChildren(array $lists = [], int $pid = 0): array {
+    public function getChildren(array $lists = [], int $pid = 0): array
+    {
         $result = [];
         foreach ($lists as $value) {
             if ($value[$this->config['pid']] == $pid) {

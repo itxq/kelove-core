@@ -106,10 +106,10 @@ class Run
         $this->app
             ->name($name)
             ->setBasePath($this->kelovePath)
-            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
-            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
-            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
-            ->setRootRoutePath('route' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath(BASE_ROOT . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath(BASE_ROOT . 'runtime' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath(BASE_ROOT . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath(BASE_ROOT . 'route' . DIRECTORY_SEPARATOR)
             ->setNamespace($namespace)
             ->path($path);
         $appRoute = $path . 'route' . DIRECTORY_SEPARATOR;

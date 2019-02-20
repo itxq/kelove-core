@@ -62,6 +62,7 @@ class Run
      */
     protected function initialize(array $config = []): void
     {
+        $this->config = $config;
         ini_set('display_errors', 'Off');
         $this->scriptName = $this->getScriptName();
         $this->getBaseRoot();
@@ -77,10 +78,10 @@ class Run
     public function console(): App
     {
         $this->app
-            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
-            ->setRootRuntimePath('runtime' . DIRECTORY_SEPARATOR)
-            ->setRootConfigPath('config' . DIRECTORY_SEPARATOR)
-            ->setRootRoutePath('route' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
+            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath(ROOT_PATH . 'route' . DIRECTORY_SEPARATOR)
             ->multi(false);
         return $this->app;
     }
@@ -126,8 +127,6 @@ class Run
     private function getAppList()
     {
         $list = [];
-        // 获取注册的应用
-        $appList = Event::trigger(self::APP_LIST_EVENT);
         // 获取app目录下的应用
         $appPath = ROOT_PATH . 'app' . DIRECTORY_SEPARATOR;
         if (is_dir($appPath)) {
@@ -135,10 +134,12 @@ class Run
             foreach ($dir as $v) {
                 $infoFile = $appPath . $v . DIRECTORY_SEPARATOR . 'info.php';
                 if (is_file($infoFile)) {
-                    $appList[] = include $infoFile;
+                    include_once $infoFile;
                 }
             }
         }
+        // 获取注册的应用
+        $appList = Event::trigger(self::APP_LIST_EVENT);
         foreach ($appList as $v) {
             if (!$this->appInfoCheck($v)) {
                 continue;

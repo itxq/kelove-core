@@ -141,7 +141,7 @@ class Run
      * 获取全部应用列表
      * @return mixed
      */
-    private function getAppList()
+    protected function getAppList()
     {
         $list = [];
         // 获取app目录下的应用
@@ -178,7 +178,7 @@ class Run
      * @param array $info
      * @return bool
      */
-    private function appInfoCheck(array $info): bool
+    protected function appInfoCheck(array $info): bool
     {
         if (
             !isset($info['app_name']) ||
@@ -195,7 +195,7 @@ class Run
     /**
      * 获取根目录
      */
-    private function getBaseRoot(): void
+    protected function getBaseRoot(): void
     {
         if (!defined('ROOT_PATH')) {
             $scriptName = realpath($this->scriptName);
@@ -215,7 +215,7 @@ class Run
      * 获取入口文件路径
      * @return string
      */
-    private function getScriptName(): string
+    protected function getScriptName(): string
     {
         return 'cli' == PHP_SAPI ? realpath($_SERVER['argv'][0]) : $_SERVER['SCRIPT_FILENAME'];
     }

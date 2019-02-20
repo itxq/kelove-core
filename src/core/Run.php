@@ -14,6 +14,7 @@ namespace kelove\core;
 
 use kelove\traits\SingleModelTrait;
 use kelove\util\File;
+use think\exception\HttpException;
 use think\facade\Event;
 use think\facade\Request;
 
@@ -63,6 +64,7 @@ class Run
     protected function initialize(array $config = []): void
     {
         $this->config = $config;
+        error_reporting(E_ALL);
         ini_set('display_errors', 'Off');
         $this->scriptName = $this->getScriptName();
         $this->getBaseRoot();
@@ -89,17 +91,23 @@ class Run
     /**
      * 初始化应用
      * @param bool $autoMulti 是否自动多应用
+     * @param bool $debug 是否开启调试模式
      * @param string $name 应用名称
-     * @return App
+     * @return $this
      */
-    public function app(bool $autoMulti, string $name = ''): App
+    public function app(bool $autoMulti, $debug = false, string $name = ''): Run
     {
         if ($autoMulti) {
             $this->app->autoMulti($this->autoMulti);
         }
         $autoName = $this->app->getName();
-        if (in_array($autoName, array_keys($this->appList))) {
-            $name = $autoName;
+        $name = empty($autoName) ? $name : $autoName;
+        if (!in_array($name, array_keys($this->appList))) {
+            try {
+                $this->app->debug($debug)->name($name)->run();
+            } catch (\Exception $e) {
+                throw new HttpException(404, 'application not exists:' . $name);
+            }
         }
         $appInfo = $this->appList[$name];
         $path = $appInfo['app_path'];
@@ -109,6 +117,7 @@ class Run
             ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
             ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
             ->setRootRoutePath(ROOT_PATH . 'route' . DIRECTORY_SEPARATOR)
+            ->debug($debug)
             ->path($path)
             ->name($name)
             ->setNamespace($namespace);
@@ -117,7 +126,15 @@ class Run
         if (is_dir($appRoute) && !is_dir($defaultRoute)) {
             File::make()->copyDir($appRoute, $defaultRoute);
         }
-        return $this->app;
+        return $this;
+    }
+    
+    /**
+     * 执行应用程序并发送数据到客户端
+     */
+    public function run()
+    {
+        $this->app->run()->send();
     }
     
     /**

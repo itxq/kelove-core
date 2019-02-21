@@ -24,10 +24,10 @@ class Tree
     use SingleModelTrait;
     
     /**
-     * 配置参数
+     * 默认配置参数
      * @var array
      */
-    protected $config = [
+    protected $defaultConfig = [
         'id'     => 'id',    // id名称
         'pid'    => 'pid',   // pid名称
         'title'  => 'title', // 标题名称
@@ -38,6 +38,15 @@ class Tree
         'step'   => 3,       // 层级步进数量
         'end'    => false,       // 前缀/后缀
     ];
+    
+    /**
+     * 初始化
+     * @param array $config
+     */
+    protected function initialize(array $config = []): void
+    {
+        $this->config = array_merge($this->defaultConfig, $config);
+    }
     
     /**
      * 将数据集格式化成层次结构

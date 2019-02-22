@@ -18,7 +18,8 @@ if (!function_exists('sort_by_key')) {
      * @param string $type - 排序类型【SORT_ASC|SORT_DESC】
      * @return array - 返回排序之后的数组
      */
-    function sort_by_key(array $array, string $keyName, string $type = 'SORT_DESC'): array {
+    function sort_by_key(array $array, string $keyName, string $type = 'SORT_DESC'): array
+    {
         if (count($array) < 1) {
             return [];
         }
@@ -42,7 +43,8 @@ if (!function_exists('byte_format')) {
      * @param int $decimals - 保留小数位数
      * @return string
      */
-    function byte_format(int $bytes, string $unit = '', int $decimals = 2): string {
+    function byte_format(int $bytes, string $unit = '', int $decimals = 2): string
+    {
         $units = ['B' => 0, 'KB' => 1, 'MB' => 2, 'GB' => 3, 'TB' => 4, 'PB' => 5, 'EB' => 6, 'ZB' => 7, 'YB' => 8];
         $value = 0;
         if ($bytes > 0) {
@@ -68,7 +70,8 @@ if (!function_exists('get_sub_value')) {
      * @param mixed $default - 指定默认值
      * @return mixed
      */
-    function get_sub_value($name, $data, $default = '') {
+    function get_sub_value($name, $data, $default = '')
+    {
         if (is_object($data)) {
             $value = isset($data->$name) ? $data->$name : $default;
         } else if (is_array($data)) {
@@ -86,7 +89,8 @@ if (!function_exists('rgb_to_hex')) {
      * @param $rgb - RGB颜色的字符串 如：rgb(255,255,255);
      * @return string 十六进制颜色值 如：#FFFFFF
      */
-    function rgb_to_hex(string $rgb): string {
+    function rgb_to_hex(string $rgb): string
+    {
         $regexp = "/^rgb\(([0-9]{0,3})\,\s*([0-9]{0,3})\,\s*([0-9]{0,3})\)/";
         preg_match($regexp, $rgb, $match);
         array_shift($match);
@@ -118,14 +122,15 @@ if (!function_exists('hex_to_rgb')) {
      * @param bool $isString - 是否返回字符串格式
      * @return array |string
      */
-    function hex_to_rgb(string $hexColor, bool $isString = false) {
+    function hex_to_rgb(string $hexColor, bool $isString = false)
+    {
         $color = str_replace('#', '', $hexColor);
         if (strlen($color) > 3) {
-            $rgb = array(
+            $rgb = [
                 'r' => hexdec(substr($color, 0, 2)),
                 'g' => hexdec(substr($color, 2, 2)),
                 'b' => hexdec(substr($color, 4, 2))
-            );
+            ];
         } else {
             $color = $hexColor;
             $r = substr($color, 0, 1) . substr($color, 0, 1);
@@ -148,7 +153,8 @@ if (!function_exists('underline_to_hump')) {
      * @param bool $isFirst - 是否为大驼峰（即首字母也大写）
      * @return string
      */
-    function underline_to_hump(string $str, bool $isFirst = false): string {
+    function underline_to_hump(string $str, bool $isFirst = false): string
+    {
         $str = preg_replace_callback('/([\-\_]+([a-z]{1}))/i', function ($matches) {
             return strtoupper($matches[2]);
         }, $str);
@@ -166,7 +172,8 @@ if (!function_exists('hump_to_underline')) {
      * @param string $str
      * @return mixed
      */
-    function hump_to_underline(string $str): string {
+    function hump_to_underline(string $str): string
+    {
         $str = preg_replace_callback('/([A-Z]{1})/', function ($matches) {
             return '_' . strtolower($matches[0]);
         }, $str);
@@ -183,7 +190,8 @@ if (!function_exists('cm_explode')) {
      * @param $delimiter - 分割符
      * @return array
      */
-    function cm_explode(string $string, string $delimiter = ','): array {
+    function cm_explode(string $string, string $delimiter = ','): array
+    {
         if (!$string || !is_string($string)) {
             return [];
         }
@@ -206,7 +214,8 @@ if (!function_exists('cm_round')) {
      * @param string $type - 指定生成字符串的类型（all-全部，num-纯数字，letter-纯字母）
      * @return string
      */
-    function cm_round(int $length = 4, string $type = 'all'): string {
+    function cm_round(int $length = 4, string $type = 'all'): string
+    {
         $str = '';
         $strUp = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $strLow = 'abcdefghijklmnopqrstuvwxyz';
@@ -235,7 +244,8 @@ if (!function_exists('cm_uuid')) {
      * 生成UUID
      * @return string
      */
-    function cm_uuid(): string {
+    function cm_uuid(): string
+    {
         $charId = md5(uniqid(mt_rand(), true));
         $uuid = substr($charId, 0, 8)
             . substr($charId, 8, 4)
@@ -253,7 +263,8 @@ if (!function_exists('cm_array_merge')) {
      * @param $array1 - 第一个参数必须，参数必须为数组
      * @return array
      */
-    function cm_array_merge(array $array1): array {
+    function cm_array_merge(array $array1): array
+    {
         $returnArray = [];
         $args = func_get_args();
         foreach ($args as $k => $v) {
@@ -276,7 +287,8 @@ if (!function_exists('format_array')) {
      * @param $delimiter - 分隔符，二级数组元素为字符串时
      * @return array -返回格式化后的数组
      */
-    function format_array(array $array, string $key = 'id', string $value = 'name', string $delimiter = ':'): array {
+    function format_array(array $array, string $key = 'id', string $value = 'name', string $delimiter = ':'): array
+    {
         $returnArray = [];
         if (!$array || !is_array($array) || count($array) < 1) {
             return $returnArray;
@@ -308,7 +320,8 @@ if (!function_exists('array_serialize_url')) {
      * @param array $array - 数组（键值对）
      * @return string -序列化后的字符串
      */
-    function array_serialize_url(array $array): string {
+    function array_serialize_url(array $array): string
+    {
         $str = '';
         if (!is_array($array) || count($array) < 1) {
             return $str;
@@ -318,5 +331,54 @@ if (!function_exists('array_serialize_url')) {
             $str .= $k . '=' . $v;
         }
         return $str;
+    }
+}
+
+if (!function_exists('cm_unserialize')) {
+    
+    /**
+     * @title 字符串、数组转换为格式化的数组
+     * @author IT小强
+     * @createTime 2019-02-22 11:05:56
+     * @param string|array|mixed $list - 原始字符串，可以为数组或者json、字符串、序列化字符串
+     * @param bool $isJsonType - 是否转换为json键值对的形式
+     * @return array
+     */
+    function cm_unserialize($list, bool $isJsonType = false): array
+    {
+        // 对普通字符串进行简析
+        if (is_string($list)) {
+            $list = htmlspecialchars_decode($list);
+            if (empty($list)) {
+                $list = [];
+            } else if (preg_match('/^{.*?}$/', $list) || preg_match('/^\[.*?\]$/', $list)) {
+                $list = json_decode($list, true);
+            } else if (preg_match('/^a:.*?(})$/', $list)) {
+                $list = unserialize($list);
+            } else {
+                $list = explode(',', $list);
+            }
+        }
+        if (!is_array($list) || count($list) < 1) {
+            return [];
+        }
+        if (!isset($list['json_key']) || !isset($list['json_value'])) {
+            return $list;
+        }
+        $returnList = [];
+        foreach ($list['json_value'] as $k => $v) {
+            if (empty($list['json_key'][$k]) && empty($v)) {
+                continue;
+            }
+            if ($isJsonType === true) {
+                $returnList[] = ['key' => $list['json_key'][$k], 'value' => $v];
+            } else {
+                $returnList[$list['json_key'][$k]] = $v;
+            }
+        }
+        if (count($returnList) === 1 && isset($returnList[0]) && $returnList[0] === '') {
+            return [];
+        }
+        return $returnList;
     }
 }

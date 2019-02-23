@@ -71,6 +71,10 @@ class Run
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App(ROOT_PATH);
+        $this->app
+            ->setRootConfigPath($this->kelovePath . 'config' . DIRECTORY_SEPARATOR)
+            ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
+            ->setRootRoutePath($this->kelovePath . 'route' . DIRECTORY_SEPARATOR);
     }
     
     /**
@@ -79,12 +83,7 @@ class Run
      */
     public function console(): App
     {
-        $this->app
-            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
-            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRoutePath(ROOT_PATH . 'route' . DIRECTORY_SEPARATOR)
-            ->multi(false);
+        $this->app->multi(false);
         return $this->app;
     }
     
@@ -112,17 +111,9 @@ class Run
         $appInfo = $this->appList[$name];
         $path = $appInfo['app_path'];
         $namespace = $appInfo['app_namespace'];
-        $this->app
-            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRuntimePath(ROOT_PATH . 'runtime' . DIRECTORY_SEPARATOR)
-            ->setRootConfigPath(ROOT_PATH . 'config' . DIRECTORY_SEPARATOR)
-            ->setRootRoutePath(ROOT_PATH . 'route' . DIRECTORY_SEPARATOR)
-            ->debug($debug)
-            ->path($path)
-            ->name($name)
-            ->setNamespace($namespace);
+        $this->app->debug($debug)->path($path)->name($name)->setNamespace($namespace);
         $appRoute = $path . 'route' . DIRECTORY_SEPARATOR;
-        $defaultRoute = ROOT_PATH . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
+        $defaultRoute = $this->kelovePath . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
         if (is_dir($appRoute) && !is_dir($defaultRoute)) {
             File::make()->copyDir($appRoute, $defaultRoute);
         }

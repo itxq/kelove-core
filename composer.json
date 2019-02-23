@@ -20,10 +20,10 @@
         "ext-gd"              : "*",
         "ext-iconv"           : "*",
         "guzzlehttp/guzzle"   : "^6.3",
-        "topthink/think-image": "^1.0"
+        "topthink/think-image": "^1.0",
+        "topthink/framework"  : "5.2.*-dev"
     },
     "require-dev" : {
-        "topthink/framework" : "5.2.*-dev",
         "itxq/ckfinder"      : "^1.0",
         "itxq/builder"       : "dev-master",
         "itxq/builder-assets": "dev-master"
@@ -33,18 +33,17 @@
             "kelove\\": "src"
         },
         "files": [
-            "src/helper.php"
+            "src/helper.php",
+            "src/app/admin/info.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "app\\"          : "app",
-            "kelove\\admin\\": "admin",
-            "test\\"         : "test"
+            "app\\" : "app",
+            "test\\": "test"
         },
         "files": [
-            "test/info.php",
-            "admin/info.php"
+            "test/info.php"
         ]
     },
     "extra"       : {

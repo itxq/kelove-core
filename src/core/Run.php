@@ -66,7 +66,6 @@ class Run
         $this->config = $config;
         error_reporting(E_ALL);
         ini_set('display_errors', 'Off');
-        $this->scriptName = $this->getScriptName();
         $this->getBaseRoot();
         $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
@@ -99,8 +98,10 @@ class Run
         if ($autoMulti) {
             $this->app->autoMulti($this->autoMulti);
         }
+        // 获取应用名称
         $autoName = $this->app->getName();
         $name = empty($autoName) ? $name : $autoName;
+        // 检查应用是否已注册
         if (!in_array($name, array_keys($this->appList))) {
             try {
                 $this->app->debug($debug)->name($name)->run();
@@ -108,15 +109,13 @@ class Run
                 throw new HttpException(404, 'application not exists:' . $name);
             }
         }
+        // 初始化应用信息
         $appInfo = $this->appList[$name];
         $path = $appInfo['app_path'];
         $namespace = $appInfo['app_namespace'];
         $this->app->debug($debug)->path($path)->name($name)->setNamespace($namespace);
-        $appRoute = $path . 'route' . DIRECTORY_SEPARATOR;
-        $defaultRoute = $this->kelovePath . 'route' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
-        if (is_dir($appRoute) && !is_dir($defaultRoute)) {
-            File::make()->copyDir($appRoute, $defaultRoute);
-        }
+        // 安装路由
+        Install::make()->installRoute($path, $name, $this->kelovePath . 'route' . DIRECTORY_SEPARATOR, false);
         return $this;
     }
     
@@ -148,11 +147,11 @@ class Run
         }
         // 获取注册的应用
         $appList = Event::trigger(self::APP_LIST_EVENT);
+        $install = Install::make();
         foreach ($appList as $v) {
             if (!$this->appInfoCheck($v)) {
                 continue;
             }
-            $v['app_path'] = realpath($v['app_path']) . DIRECTORY_SEPARATOR;
             $v['app_alias'] = get_sub_value('app_alias', $v, '');
             if (!empty($v['app_alias'])) {
                 $this->autoMulti[$v['app_alias']] = $v['app_name'];
@@ -160,6 +159,7 @@ class Run
                 $v['app_alias'] = $v['app_name'];
             }
             $list[$v['app_name']] = $v;
+            $install->installAssets($v['app_path'], $v['app_name'], PUBLIC_PATH, false);
         }
         return $list;
     }
@@ -188,6 +188,10 @@ class Run
      */
     protected function getBaseRoot(): void
     {
+        $this->scriptName = $this->getScriptName();
+        if (!defined('PUBLIC_PATH')) {
+            define('PUBLIC_PATH', realpath(dirname($this->scriptName)) . DIRECTORY_SEPARATOR);
+        }
         if (!defined('ROOT_PATH')) {
             $scriptName = realpath($this->scriptName);
             if (strrpos(basename($scriptName), '.php') === false) {

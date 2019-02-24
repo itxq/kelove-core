@@ -34,12 +34,12 @@
         },
         "files": [
             "src/helper.php",
-            "src/app/admin/info.php"
+            "src/app/admin/info.php",
+            "src/app/install/info.php"
         ]
     },
     "autoload-dev": {
         "psr-4": {
-            "app\\" : "app",
             "test\\": "test"
         },
         "files": [

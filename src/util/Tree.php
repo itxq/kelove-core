@@ -41,11 +41,10 @@ class Tree
     
     /**
      * 初始化
-     * @param array $config
      */
-    protected function initialize(array $config = []): void
+    protected function initialize(): void
     {
-        $this->config = array_merge($this->defaultConfig, $config);
+        $this->config = array_merge($this->defaultConfig, $this->config);
     }
     
     /**

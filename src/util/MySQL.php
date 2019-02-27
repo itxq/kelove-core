@@ -55,7 +55,7 @@ class MySQL
     private $size = 0;
     
     /**
-     * @var integer - 默认备份配置
+     * @var array - 默认备份配置
      */
     protected $defaultConfig = [
         // 数据库备份路径
@@ -82,12 +82,12 @@ class MySQL
     
     /**
      * 初始化加载
-     * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void
+    protected function initialize(): void
     {
-        $this->file = get_sub_value('file', $config, []);
-        $this->database = get_sub_value('database', $config, []);
+        $this->config = array_merge($this->defaultConfig, $this->config);
+        $this->file = get_sub_value('file', $this->config, []);
+        $this->database = get_sub_value('database', $this->config, []);
         $this->db = \think\facade\Db::connect($this->database);
     }
     
@@ -310,7 +310,7 @@ class MySQL
             
             //还有更多数据
             if ($count > $start + 1000) {
-                return array($start + 1000, $count);
+                return [$start + 1000, $count];
             }
         }
         
@@ -368,7 +368,7 @@ class MySQL
                     return false;
                 }
                 $sql = '';
-            } elseif ($this->config['compress'] ? gzeof($gz) : feof($gz)) {
+            } else if ($this->config['compress'] ? gzeof($gz) : feof($gz)) {
                 return 0;
             }
         }

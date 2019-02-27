@@ -41,14 +41,13 @@ trait SingleModelTrait
     protected function __construct(array $config = [])
     {
         $this->config = array_merge($this->config, $config);
-        $this->initialize($this->config);
+        $this->initialize();
     }
     
     /**
      * 初始化加载
-     * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void
+    protected function initialize(): void
     {
     }
     

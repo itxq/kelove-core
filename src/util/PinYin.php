@@ -40,18 +40,17 @@ class PinYin
     
     /**
      * 初始化加载
-     * @param array $config - 配置信息
      */
-    protected function initialize(array $config = []): void
+    protected function initialize(): void
     {
-        if (isset($config['keys']) && !empty($config['keys'])) {
-            $this->keys = $config['keys'];
+        if (isset($this->config['keys']) && !empty($this->config['keys'])) {
+            $this->keys = $this->config['keys'];
         }
-        if (isset($config['values']) && !empty($config['values'])) {
-            $this->values = $config['values'];
+        if (isset($this->config['values']) && !empty($this->config['values'])) {
+            $this->values = $this->config['values'];
         }
-        if (isset($config['preg']) && !empty($config['preg'])) {
-            $this->preg = $config['preg'];
+        if (isset($this->config['preg']) && !empty($this->config['preg'])) {
+            $this->preg = $this->config['preg'];
         }
     }
     
@@ -113,7 +112,7 @@ class PinYin
     {
         if ($num > 0 && $num < 160) {
             return chr($num);
-        } elseif ($num < -20319 || $num > -10247) {
+        } else if ($num < -20319 || $num > -10247) {
             return '';
         } else {
             $k = '';

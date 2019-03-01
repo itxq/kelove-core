@@ -29,22 +29,22 @@ abstract class Api extends Base
     /**
      * 验证方式：token或session
      */
-    const CHECK_ANY = 1;
+    protected const CHECK_ANY = 1;
     
     /**
      * 验证方式：仅token
      */
-    const CHECK_TOKEN = 2;
+    protected const CHECK_TOKEN = 2;
     
     /**
      * 验证方式：仅session
      */
-    const CHECK_SESSION = 3;
+    protected const CHECK_SESSION = 3;
     
     /**
      * 验证方式：token和session
      */
-    const CHECK_ALL = 4;
+    protected const CHECK_ALL = 4;
     
     /**
      * @var int API验证类型
@@ -111,14 +111,14 @@ abstract class Api extends Base
      * @author IT小强
      * @createTime 2019-02-27 19:45:26
      */
-    protected function initialize()
+    protected function initialize(): void
     {
         // 获取action token session数据
         $this->getApiCheckInfo();
         // 请求方式检查
         $this->requestTypeCheck();
         // 接口验证
-        if (!in_array($this->action, array_map('strtolower', $this->allowAction))) {
+        if (!in_array($this->action, array_map('strtolower', $this->allowAction), true)) {
             $this->apiCheck();
         }
         parent::initialize();
@@ -144,7 +144,7 @@ abstract class Api extends Base
             $check = false;
         }
         if (!$check) {
-            return $this->apiResult(-1, $this->errorMessage, [], $this->resultType, []);
+            return $this->apiResult(-1, $this->errorMessage);
         }
         return true;
     }
@@ -183,13 +183,13 @@ abstract class Api extends Base
      */
     protected function requestTypeCheck(): bool
     {
-        if (in_array($this->action, array_map('strtolower', $this->postAction)) && !Request::isPost()) {
-            return $this->apiResult(-2, '请求方式错误 必须为POST', [], $this->resultType, []);
-        } else if (in_array($this->action, array_map('strtolower', $this->getAction)) && !Request::isGet()) {
-            return $this->apiResult(-2, '请求方式错误 必须为GET', [], $this->resultType, []);
-        } else {
-            return true;
+        if (!Request::isPost() && in_array($this->action, array_map('strtolower', $this->postAction), true)) {
+            return $this->apiResult(-2, '请求方式错误 必须为POST');
         }
+        if (!Request::isGet() && in_array($this->action, array_map('strtolower', $this->getAction), true)) {
+            return $this->apiResult(-2, '请求方式错误 必须为GET');
+        }
+        return true;
     }
     
     /**
@@ -197,7 +197,7 @@ abstract class Api extends Base
      * @author IT小强
      * @createTime 2019-02-27 19:43:16
      */
-    protected function getApiCheckInfo()
+    protected function getApiCheckInfo(): void
     {
         // 获取action
         $this->action = strtolower(Request::action());
@@ -214,11 +214,12 @@ abstract class Api extends Base
      * @param string $msg - 提示信息
      * @param mixed $data - 返回的数据
      * @param array $header - 发送的Header信息
+     * @param string $type - 返回数据格式
      * @return bool
      */
-    protected function apiResultSuccess(string $msg = '', $data = [], array $header = [])
+    protected function apiResultSuccess(string $msg = '', $data = [], array $header = [], string $type = ''): bool
     {
-        return $this->apiResult(1, $msg, $data, $this->resultType, $header);
+        return $this->apiResult(1, $msg, $data, $header, $type);
     }
     
     /**
@@ -228,11 +229,12 @@ abstract class Api extends Base
      * @param string $msg - 提示信息
      * @param mixed $data - 返回的数据
      * @param array $header - 发送的Header信息
+     * @param string $type - 返回数据格式
      * @return bool
      */
-    protected function apiResultError(string $msg = '', $data = [], array $header = [])
+    protected function apiResultError(string $msg = '', $data = [], array $header = [], string $type = ''): bool
     {
-        return $this->apiResult(0, $msg, $data, $this->resultType, $header);
+        return $this->apiResult(0, $msg, $data, $header, $type);
     }
     
     /**
@@ -241,12 +243,12 @@ abstract class Api extends Base
      * @createTime 2019-02-27 20:35:15
      * @param int $code - 返回的code
      * @param string $msg - 提示信息
-     * @param string $type - 返回数据格式
      * @param mixed $data - 返回的数据
      * @param array $header - 发送的Header信息
+     * @param string $type - 返回数据格式
      * @return bool
      */
-    protected function apiResult(int $code = 0, string $msg = '', $data = [], string $type = '', array $header = [])
+    protected function apiResult(int $code, string $msg = '', $data = [], array $header = [], string $type = ''): bool
     {
         $type = empty($type) ? $this->resultType : $type;
         $this->result($data, $code, $msg, $type, $header);

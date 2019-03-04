@@ -59,8 +59,8 @@ trait SingleModelTrait
      */
     public static function make(array $config = [], bool $force = false)
     {
-        $className = get_called_class();
-        if (!isset(self::$instances[$className]) || !self::$instances[$className] instanceof $className || $force === true) {
+        $className = static::class;
+        if ($force === true || !isset(self::$instances[$className]) || !self::$instances[$className] instanceof $className) {
             $instance = new $className($config);
             self::$instances[$className] = $instance;
         }
@@ -78,10 +78,9 @@ trait SingleModelTrait
     
     /**
      * 克隆防止继承
-     * @return bool
      */
     final private function __clone()
     {
-        return false;
+    
     }
 }

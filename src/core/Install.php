@@ -44,12 +44,11 @@ class Install
             return true;
         }
         $defaultRoute = realpath($routePath) . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR;
-        if (is_dir($defaultRoute) && $isCover === false) {
+        if ($isCover === false && is_dir($defaultRoute)) {
             // 路由已安装
             return true;
         }
-        $copy = File::make()->copyDir($appRoute, $defaultRoute);
-        return $copy;
+        return File::make()->copyDir($appRoute, $defaultRoute);
     }
     
     /**
@@ -64,7 +63,7 @@ class Install
      */
     public function installAssets(string $appPath, string $appName, string $assetsPath, bool $isCover = false): bool
     {
-        if ('cli' == PHP_SAPI) {
+        if ('cli' === PHP_SAPI) {
             // cli模式下不安装资源
             return true;
         }
@@ -74,11 +73,10 @@ class Install
             return true;
         }
         $defaultRoute = realpath($assetsPath) . DIRECTORY_SEPARATOR . $appName . DIRECTORY_SEPARATOR;
-        if (is_dir($defaultRoute) && $isCover === false) {
+        if ($isCover === false && is_dir($defaultRoute)) {
             // 资源已安装
             return true;
         }
-        $copy = File::make()->copyDir($appRoute, $defaultRoute);
-        return $copy;
+        return File::make()->copyDir($appRoute, $defaultRoute);
     }
 }

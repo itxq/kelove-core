@@ -361,8 +361,8 @@ class MySQL
         
         for ($i = 0; $i < 1000; $i++) {
             $sql .= $this->config['compress'] ? gzgets($gz) : fgets($gz);
-            if (preg_match('/.*;$/', trim($sql))) {
-                if (false !== $this->db->execute($sql)) {
+            if (preg_match('/;$/', trim($sql))) {
+                if (false !== $this->db::execute($sql)) {
                     $start += strlen($sql);
                 } else {
                     return false;
@@ -429,8 +429,7 @@ class MySQL
     {
         try {
             $tables = [];
-            $tableInfo = $this->db
-                ->query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . get_sub_value('database',
+            $tableInfo = $this->db::query('SELECT table_name FROM information_schema.tables WHERE table_schema=\'' . get_sub_value('database',
                         $this->database, '') . '\'');
             foreach ($tableInfo as $k => $v) {
                 $tables[] = is_array($v) ? array_values($v)[0] : $v;

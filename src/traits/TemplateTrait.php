@@ -33,8 +33,8 @@ trait TemplateTrait
     {
         $name = empty($name) ? 'default' : $name;
         $suffix = empty($suffix) ? '.' . config('url_html_suffix') : $suffix;
-        $path = empty($path) ? Env::get('root_path') . 'template' . DIRECTORY_SEPARATOR : realpath($path);
-        $pre = $path . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
+        $truePath = empty($path) ? Env::get('root_path') . 'template' . DIRECTORY_SEPARATOR : realpath($path);
+        $pre = $truePath . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
         $template = File::make()->getFiles($pre, true);
         $pattern = '/^(' . addslashes($pre) . ')(.*?)(\\' . addslashes($suffix) . ')$/';
         $cacheTag = 'system_template';
@@ -48,7 +48,7 @@ trait TemplateTrait
                 continue;
             }
             $item = preg_replace($pattern, '\2', $k);
-            $item = str_replace([DIRECTORY_SEPARATOR], ['/'], $item);
+            $item = str_replace(DIRECTORY_SEPARATOR, '/', $item);
             $item = strtolower($item);
             unset($template[$k]);
             $template[$item] = $v;

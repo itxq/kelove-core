@@ -19,7 +19,7 @@ namespace kelove\core;
  */
 class App extends \think\App
 {
-    const VERSION = '1.0.0RC1';
+    public const VERSION = '1.0.0RC1';
     
     /**
      * 运行根目录
@@ -44,10 +44,10 @@ class App extends \think\App
      * @param string $path 应用基础目录
      * @return $this
      */
-    public function setBasePath(string $path)
+    public function setBasePath(string $path): \think\App
     {
         $path = $this->createDir($path);
-        if ($path) {
+        if (!empty($path)) {
             $this->basePath = $path;
         }
         return $this;
@@ -59,10 +59,10 @@ class App extends \think\App
      * @param string $path 运行根目录
      * @return $this
      */
-    public function setRootRuntimePath(string $path)
+    public function setRootRuntimePath(string $path): \think\App
     {
         $path = $this->createDir($path);
-        if ($path) {
+        if (!empty($path)) {
             $this->rootRuntimePath = $path;
         }
         return $this;
@@ -74,10 +74,10 @@ class App extends \think\App
      * @param string $path 路由根目录
      * @return $this
      */
-    public function setRootRoutePath(string $path)
+    public function setRootRoutePath(string $path): \think\App
     {
         $path = $this->createDir($path);
-        if ($path) {
+        if (!empty($path)) {
             $this->rootRoutePath = $path;
         }
         return $this;
@@ -89,10 +89,10 @@ class App extends \think\App
      * @param string $path
      * @return $this
      */
-    public function setRootConfigPath(string $path)
+    public function setRootConfigPath(string $path): \think\App
     {
         $path = $this->createDir($path);
-        if ($path) {
+        if (!empty($path)) {
             $this->rootConfigPath = $path;
         }
         return $this;
@@ -129,7 +129,7 @@ class App extends \think\App
             'base_root'   => $baseRoot,
             'extend_path' => $baseRoot . 'extend' . DIRECTORY_SEPARATOR,
             'vendor_path' => $baseRoot . 'vendor' . DIRECTORY_SEPARATOR,
-            'kelove_path' => realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR,
+            'kelove_path' => dirname(__DIR__) . DIRECTORY_SEPARATOR,
         ]);
     }
     
@@ -152,15 +152,15 @@ class App extends \think\App
     /**
      * 创建目录
      * @param string $path 路径
-     * @return bool|string
+     * @return string
      */
-    protected function createDir(string $path)
+    protected function createDir(string $path): string
     {
         if (is_dir($path)) {
             return realpath($path) . DIRECTORY_SEPARATOR;
         }
-        if (!mkdir($path, 0777, true)) {
-            return false;
+        if (!mkdir($path, 0755, true, null)) {
+            return '';
         }
         return realpath($path) . DIRECTORY_SEPARATOR;
     }

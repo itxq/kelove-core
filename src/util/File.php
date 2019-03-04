@@ -44,14 +44,14 @@ class File
      * @param string $openMod - 打开方式
      * @return bool - true 成功false 失败
      */
-    public function writeFile($filename, $writeText, $openMod = 'w'): bool
+    public function writeFile($filename, $writeText, $openMod = 'b'): bool
     {
-        if (@$fp = fopen($filename, $openMod)) {
-            flock($fp, 2);
+        try {
+            $fp = fopen($filename, $openMod);
             fwrite($fp, $writeText);
             fclose($fp);
             return true;
-        } else {
+        } catch (\Exception $exception) {
             return false;
         }
     }
@@ -70,7 +70,7 @@ class File
         $dir = opendir($dirName);
         while ($fileName = readdir($dir)) {
             $file = $dirName . '/' . $fileName;
-            if ($fileName != '.' && $fileName != '..') {
+            if ($fileName !== '.' && $fileName !== '..') {
                 if (is_dir($file)) {
                     $this->delDir($file);
                 } else {
@@ -103,7 +103,7 @@ class File
         while ($fileName = readdir($file)) {
             $file1 = $surDir . '/' . $fileName;
             $file2 = $toDir . '/' . $fileName;
-            if ($fileName != '.' && $fileName != '..') {
+            if ($fileName !== '.' && $fileName !== '..') {
                 if (is_dir($file1)) {
                     $this->copyDir($file1, $file2);
                 } else {
@@ -125,16 +125,17 @@ class File
     {
         $dir = rtrim($dir, '/') . '/';
         $dirArray = [];
-        if (false != ($handle = opendir($dir))) {
+        $handle = opendir($dir);
+        if (false !== $handle) {
             $i = 0;
             $j = 0;
             while (false !== ($file = readdir($handle))) {
                 if (is_dir($dir . $file)) { //判断是否文件夹
-                    if ($isDel == false) {
+                    if ($isDel === false) {
                         $dirArray ['dir'] [$i] = $file;
                         $i++;
                     } else {
-                        if ($file != '.' && $file != '..') {
+                        if ($file !== '.' && $file !== '..') {
                             $dirArray ['dir'] [$i] = $file;
                             $i++;
                         }
@@ -192,7 +193,7 @@ class File
         $dirList = opendir($dir);
         $dirSize = 0;
         while (false !== ($folderOrFile = readdir($dirList))) {
-            if ($folderOrFile != '.' && $folderOrFile != '..') {
+            if ($folderOrFile !== '.' && $folderOrFile !== '..') {
                 if (is_dir("$dir/$folderOrFile")) {
                     $dirSize += $this->getSize("$dir/$folderOrFile");
                 } else {
@@ -211,23 +212,19 @@ class File
      */
     public function emptyDir(string $dir): bool
     {
-        return (($files = @scandir($dir)) && count($files) <= 2);
+        return (($files = @scandir($dir, null)) && count($files) <= 2);
     }
     
     /**
      * 解压zip格式的压缩文件
      * @param string $zipFile - zip文件路径
      * @param string $unzipDir - 解压路径
-     * @param bool $mkNameDir - 是否以压缩文件名命起始目录
+     * @param bool|string $mkNameDir - 是否以压缩文件名命起始目录
      * @param bool $overWrite - 是否覆盖已有文件(true-覆盖|false-不覆盖|string-以该字符串命名目录)
      * @return bool
      */
-    public function unzip(
-        string $zipFile,
-        string $unzipDir = './',
-        bool $mkNameDir = false,
-        bool $overWrite = false
-    ): bool {
+    public function unzip(string $zipFile, string $unzipDir = './', $mkNameDir = false, bool $overWrite = false): bool
+    {
         // 获取压缩文件全路径
         $zipFile = realpath($zipFile);
         if (!is_file($zipFile)) {
@@ -242,7 +239,7 @@ class File
             return false;
         }
         // 如果不存在 创建目标解压目录
-        if (!is_dir($unzipDir) && !mkdir($unzipDir, 0755, true)) {
+        if (!is_dir($unzipDir) && !mkdir($unzipDir, 0755, true, null)) {
             $this->message = '创建目录失败';
             return false;
         }
@@ -254,7 +251,7 @@ class File
                 $zipName = $mkNameDir;
             } else {
                 // 创建和压缩文件名相同的目录名作为起始目录
-                $start = intval(strrpos($zipFile, DIRECTORY_SEPARATOR));
+                $start = (int)strrpos($zipFile, DIRECTORY_SEPARATOR);
                 $end = strrpos($zipFile, '.') - 1;
                 $zipName = substr($zipFile, $start + 1, $end - $start);
             }
@@ -262,7 +259,7 @@ class File
         }
         
         // 如果不存在 创建目标解压目录
-        if (!is_dir($unzipDir) && !mkdir($unzipDir, 0755, true)) {
+        if (!is_dir($unzipDir) && !mkdir($unzipDir, 0755, true, null)) {
             $this->message = '创建目录失败';
             return false;
         }
@@ -277,7 +274,7 @@ class File
                 // 如果是目录则拼装完整路径
                 $thisPath = $unzipDir . substr($zipEntryName, 0, $posLastSlash) . DIRECTORY_SEPARATOR;
                 // 目录不存在时，创建目录
-                if (!is_dir($thisPath) && !mkdir($thisPath, 0755, true)) {
+                if (!is_dir($thisPath) && !mkdir($thisPath, 0755, true, null)) {
                     $this->message = '创建目录失败';
                     return false;
                 }
@@ -287,7 +284,7 @@ class File
                 // 文件名保存在磁盘上
                 $fileName = $unzipDir . $zipEntryName;
                 // 检查文件是否需要重写
-                if (!is_file($fileName) || ($overWrite === true)) {
+                if ($overWrite === true || !is_file($fileName)) {
                     // 读取压缩文件的内容
                     $readeContent = zip_entry_read($zipEntry, zip_entry_filesize($zipEntry));
                     @file_put_contents($fileName, $readeContent);

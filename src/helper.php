@@ -50,9 +50,11 @@ if (!function_exists('byte_format')) {
         if ($bytes > 0) {
             if (!array_key_exists($unit, $units)) {
                 $pow = floor(log($bytes) / log(1024));
-                $unit = array_search($pow, $units);
+                $_unit = array_search($pow, $units, null);
+            } else {
+                $_unit = $unit;
             }
-            $value = ($bytes / pow(1024, floor($units[$unit])));
+            $value = $bytes / (1024 ** floor($units[$_unit]));
         }
         
         if (!is_numeric($decimals) || $decimals < 0) {
@@ -91,10 +93,10 @@ if (!function_exists('rgb_to_hex')) {
      */
     function rgb_to_hex(string $rgb): string
     {
-        $regexp = "/^rgb\(([0-9]{0,3})\,\s*([0-9]{0,3})\,\s*([0-9]{0,3})\)/";
+        $regexp = "/^rgb\((\d{0,3})\,\s*(\d{0,3})\,\s*(\d{0,3})\)/";
         preg_match($regexp, $rgb, $match);
         array_shift($match);
-        $hexColor = "#";
+        $hexColor = '#';
         $hex = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
         for ($i = 0; $i < 3; $i++) {
             $r = null;
@@ -103,9 +105,9 @@ if (!function_exists('rgb_to_hex')) {
             while ($c > 16) {
                 $r = $c % 16;
                 $c = ($c / 16) >> 0;
-                array_push($hexAr, $hex[$r]);
+                $hexAr[] = $hex[$r];
             }
-            array_push($hexAr, $hex[$c]);
+            $hexAr[] = $hex[$c];
             $ret = array_reverse($hexAr);
             $item = implode('', $ret);
             $item = str_pad($item, 2, '0', STR_PAD_LEFT);
@@ -133,9 +135,9 @@ if (!function_exists('hex_to_rgb')) {
             ];
         } else {
             $color = $hexColor;
-            $r = substr($color, 0, 1) . substr($color, 0, 1);
-            $g = substr($color, 1, 1) . substr($color, 1, 1);
-            $b = substr($color, 2, 1) . substr($color, 2, 1);
+            $r = $color[0] . $color[0];
+            $g = $color[1] . $color[1];
+            $b = $color[2] . $color[2];
             $rgb = ['r' => hexdec($r), 'g' => hexdec($g), 'b' => hexdec($b)];
         }
         if ($isString) {
@@ -174,11 +176,11 @@ if (!function_exists('hump_to_underline')) {
      */
     function hump_to_underline(string $str): string
     {
-        $str = preg_replace_callback('/([A-Z]{1})/', function ($matches) {
+        $result = preg_replace_callback('/([A-Z]{1})/', function ($matches) {
             return '_' . strtolower($matches[0]);
         }, $str);
-        $str = preg_replace('/^\_/', '', $str);
-        return $str;
+        $result = preg_replace('/^\_/', '', $result);
+        return $result;
     }
 }
 
@@ -231,8 +233,12 @@ if (!function_exists('cm_round')) {
                 $strPol = $strUp . $number . $strLow;
         }
         $max = strlen($strPol) - 1;
-        for ($i = 0; $i < $length; $i++) {
-            $str .= $strPol[mt_rand(0, $max)];
+        try {
+            for ($i = 0; $i < $length; $i++) {
+                $str .= $strPol[random_int(0, $max)];
+            }
+        } catch (\Exception $exception) {
+        
         }
         return $str;
     }
@@ -354,7 +360,7 @@ if (!function_exists('cm_unserialize')) {
             } else if (preg_match('/^{.*?}$/', $list) || preg_match('/^\[.*?\]$/', $list)) {
                 $list = json_decode($list, true);
             } else if (preg_match('/^a:.*?(})$/', $list)) {
-                $list = unserialize($list);
+                $list = unserialize($list, null);
             } else {
                 $list = explode(',', $list);
             }
@@ -362,12 +368,12 @@ if (!function_exists('cm_unserialize')) {
         if (!is_array($list) || count($list) < 1) {
             return [];
         }
-        if (!isset($list['json_key']) || !isset($list['json_value'])) {
+        if (!isset($list['json_key'], $list['json_value'])) {
             return $list;
         }
         $returnList = [];
         foreach ($list['json_value'] as $k => $v) {
-            if (empty($list['json_key'][$k]) && empty($v)) {
+            if (empty($v) && empty($list['json_key'][$k])) {
                 continue;
             }
             if ($isJsonType === true) {

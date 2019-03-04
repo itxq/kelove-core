@@ -27,7 +27,7 @@ class Tree
      * 默认配置参数
      * @var array
      */
-    protected $defaultConfig = [
+    protected static $defaultConfig = [
         'id'     => 'id',    // id名称
         'pid'    => 'pid',   // pid名称
         'title'  => 'title', // 标题名称
@@ -44,7 +44,7 @@ class Tree
      */
     protected function initialize(): void
     {
-        $this->config = array_merge($this->defaultConfig, $this->config);
+        $this->config = array_merge(self::$defaultConfig, $this->config);
     }
     
     /**
@@ -57,22 +57,22 @@ class Tree
      */
     public function toLayer(array $lists = [], int $pid = 0, int $maxLevel = 0, int $curLevel = 0): array
     {
-        $trees = [];
+        $result = [];
         $lists = array_values($lists);
         foreach ($lists as $key => $value) {
-            if ($value[$this->config['pid']] == $pid) {
-                if ($maxLevel > 0 && $curLevel == $maxLevel) {
-                    return $trees;
+            if ((int)$value[$this->config['pid']] === $pid) {
+                if ($maxLevel > 0 && $curLevel === $maxLevel) {
+                    return $result;
                 }
                 unset($lists[$key]);
                 $child = $this->toLayer($lists, $value[$this->config['id']], $maxLevel, $curLevel + 1);
                 if (!empty($child)) {
                     $value[$this->config['child']] = $child;
                 }
-                $trees[] = $value;
+                $result[] = $value;
             }
         }
-        return $trees;
+        return $result;
     }
     
     /**
@@ -81,62 +81,62 @@ class Tree
      * @param  int $pid 父级id
      * @param  int $level 级别
      * @param  array $parent 父级信息(自动生成，无需赋值)
+     * @param  array $result 返回结果（无需赋值）
      * @return array 列表结构(一维数组)
      */
-    public function toList(array $lists = [], int $pid = 0, int $level = 0, array $parent = []): array
+    public function toList(array $lists, int $pid = 0, int $level = 0, array $parent = [], array $result = []): array
     {
-        $trees = [];
         foreach ($lists as $key => $value) {
-            if ($value[$this->config['pid']] == $pid) {
+            if ((int)$value[$this->config['pid']] === $pid) {
                 $title_prefix = str_repeat($this->config['repeat'], $level * $this->config['step']);
                 if ($this->config['end']) {
                     $title_prefix = $this->config['html'] . $title_prefix;
                 } else {
-                    $title_prefix = $title_prefix . $this->config['html'];
+                    $title_prefix .= $this->config['html'];
                 }
                 $value[$this->config['parent']] = $parent;
                 $value['level'] = $level + 1;
                 $value['title_prefix'] = $title_prefix;
                 $value['title_display'] = $title_prefix . $value[$this->config['title']];
-                $trees[] = $value;
+                $result[] = $value;
                 unset($lists[$key]);
-                $trees = array_merge($trees, $this->toList($lists, $value[$this->config['id']], $level + 1, $value));
+                $result = $this->toList($lists, $value[$this->config['id']], $level + 1, $value, $result);
             }
         }
-        return $trees;
+        return $result;
     }
     
     /**
      * 根据子节点返回所有父节点
      * @param  array $lists 数据集
      * @param  int $id 子节点id
+     * @param  array $result 返回结果（无需赋值）
      * @return array
      */
-    public function getParents(array $lists = [], int $id = 0): array
+    public function getParents(array $lists = [], int $id = 0, array $result = []): array
     {
-        $trees = [];
         foreach ($lists as $value) {
-            if ($value[$this->config['id']] == $id) {
-                $trees[] = $value;
-                $trees = array_merge($this->getParents($lists, $value[$this->config['pid']]), $trees);
+            if ((int)$value[$this->config['id']] === $id) {
+                $result[] = $value;
+                $result = $this->getParents($lists, $value[$this->config['pid']], $result);
             }
         }
-        return $trees;
+        return $result;
     }
     
     /**
      * 获取所有子节点id
      * @param  array $lists 数据集
      * @param  int $pid 父级id
+     * @param  array $result 返回结果（无需赋值）
      * @return array
      */
-    public function getChildrenIds(array $lists = [], int $pid = 0): array
+    public function getChildrenIds(array $lists = [], int $pid = 0, array $result = []): array
     {
-        $result = [];
         foreach ($lists as $value) {
-            if ($value[$this->config['pid']] == $pid) {
+            if ((int)$value[$this->config['pid']] === $pid) {
                 $result[] = $value[$this->config['id']];
-                $result = array_merge($result, $this->getChildrenIds($lists, $value[$this->config['id']]));
+                $result = $this->getChildrenIds($lists, $value[$this->config['id']], $result);
             }
         }
         return $result;
@@ -146,15 +146,15 @@ class Tree
      * 获取所有子节点
      * @param  array $lists 数据集
      * @param  int $pid 父级id
+     * @param  array $result 返回结果（无需赋值）
      * @return array
      */
-    public function getChildren(array $lists = [], int $pid = 0): array
+    public function getChildren(array $lists = [], int $pid = 0, array $result = []): array
     {
-        $result = [];
         foreach ($lists as $value) {
-            if ($value[$this->config['pid']] == $pid) {
+            if ((int)$value[$this->config['pid']] === $pid) {
                 $result[] = $value;
-                $result = array_merge($result, $this->getChildren($lists, $value[$this->config['id']]));
+                $result = $this->getChildren($lists, $value[$this->config['id']], $result);
             }
         }
         return $result;

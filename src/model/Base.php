@@ -27,12 +27,12 @@ abstract class Base extends Model
     /**
      * VARCHAR 最大值
      */
-    const VARCHAR_MAX = 255;
+    public const VARCHAR_MAX = 191;
     
     /**
      * INT 最大值
      */
-    const INT_MAX = 11;
+    public const INT_MAX = 11;
     
     /**
      * 软删除字段名称
@@ -47,46 +47,37 @@ abstract class Base extends Model
     protected $defaultSoftDelete = 0;
     
     /**
-     * 静态调用
-     * @return static
-     */
-    public static function make()
-    {
-        return new static();
-    }
-    
-    /**
      * 递归获取所有下级ID
      * @param int $id 父级分类ID，默认0，即获取所有分类ID
-     * @param string $pidName 父级分类字段名称 默认为pid
-     * @param int $loopTimes 获取分类层数（截止到n级分类）
-     * @param int $countNum 记录分类层数,无需赋值
-     * @param string $idList 记录id列表,无需赋值
+     * @param string $pid 父级分类字段名称 默认为pid
+     * @param int $loop 获取分类层数（截止到n级分类）
+     * @param int $count 记录分类层数,无需赋值
+     * @param string $result 记录id列表,无需赋值
      * @return string
      */
     public function getSonIds(
         int $id = 0,
-        string $pidName = 'pid',
-        int $loopTimes = 0,
-        int $countNum = 0,
-        string $idList = ''
-    ) {
+        string $pid = 'pid',
+        int $loop = 0,
+        int $count = 0,
+        string $result = ''
+    ): string {
         /* 初始化 id 字符串列表 （首先把当前分类加入列表）*/
-        $idList .= empty($idList) ? strval($id) : '';
-        $where = [[$pidName, 'EQ', intval($id)], ['status', 'EQ', 1]];
-        $select = $this->field('id')->where($where)->column('id');
+        $result .= empty($result) ? (string)$id : '';
+        $where = [[$pid, 'EQ', $id], ['status', 'EQ', 1]];
+        $select = self::field('id')->where($where)->column('id');
         if (!is_array($select) || count($select) < 1) {
-            return $idList;
+            return $result;
         }
         /* 初始化 id 数组 */
-        $countNum++;
+        $count++;
         /* 执行生成字符串 */
         foreach ($select as $idValue) {
-            $idList .= ',' . $idValue;
-            if ($loopTimes === 0 || $countNum < $loopTimes) {
-                $idList = $this->getSonIds($idValue, $pidName, $loopTimes, $countNum, $idList);
+            $result .= ',' . $idValue;
+            if ($loop === 0 || $count < $loop) {
+                $result = $this->getSonIds($idValue, $pid, $loop, $count, $result);
             }
         }
-        return $idList;
+        return $result;
     }
 }

@@ -30,7 +30,7 @@ class Run
     /**
      * 应用列表事件标识
      */
-    const APP_LIST_EVENT = 'kelove_app_list';
+    public const APP_LIST_EVENT = 'kelove_app_list';
     
     /**
      * @var string 应用入口文件
@@ -67,7 +67,7 @@ class Run
         error_reporting(E_ALL);
         ini_set('display_errors', 'Off');
         $this->getBaseRoot();
-        $this->kelovePath = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR;
+        $this->kelovePath = dirname(__DIR__) . DIRECTORY_SEPARATOR;
         $this->appList = $this->getAppList();
         $this->app = new App(ROOT_PATH);
         $this->app
@@ -102,7 +102,7 @@ class Run
         $autoName = $this->app->getName();
         $name = empty($autoName) ? $name : $autoName;
         // 检查应用是否已注册
-        if (!in_array($name, array_keys($this->appList))) {
+        if (!array_key_exists($name, $this->appList)) {
             try {
                 $this->app->debug($debug)->name($name)->run();
             } catch (\Exception $e) {
@@ -122,7 +122,7 @@ class Run
     /**
      * 执行应用程序并发送数据到客户端
      */
-    public function run()
+    public function run(): void
     {
         $this->app->run()->send();
     }
@@ -171,16 +171,7 @@ class Run
      */
     protected function appInfoCheck(array $info): bool
     {
-        if (
-            !isset($info['app_name']) ||
-            !isset($info['app_title']) ||
-            !isset($info['app_path']) ||
-            !is_dir($info['app_path']) ||
-            !isset($info['app_namespace'])
-        ) {
-            return false;
-        }
-        return true;
+        return !(!isset($info['app_name'], $info['app_title'], $info['app_path'], $info['app_namespace']) || !is_dir($info['app_path']));
     }
     
     /**
@@ -200,7 +191,7 @@ class Run
                 $baseFile = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], Request::baseFile());
                 $pattern = '#^(.*?)(' . addslashes($baseFile) . ')$#';
                 $baseRoot = preg_replace($pattern, "$1", $scriptName);
-                $baseRoot = realpath($baseRoot . '/../') . DIRECTORY_SEPARATOR;
+                $baseRoot = dirname($baseRoot) . DIRECTORY_SEPARATOR;
             }
             define('ROOT_PATH', $baseRoot);
         }
@@ -212,6 +203,6 @@ class Run
      */
     protected function getScriptName(): string
     {
-        return 'cli' == PHP_SAPI ? realpath($_SERVER['argv'][0]) : $_SERVER['SCRIPT_FILENAME'];
+        return 'cli' === PHP_SAPI ? realpath($_SERVER['argv'][0]) : $_SERVER['SCRIPT_FILENAME'];
     }
 }

@@ -23,11 +23,11 @@ class IP
 {
     use SingleModelTrait;
     
-    const  BEGIN_IP = 'begin_ip';
-    const  END_IP = 'end_ip';
-    const  COUNTRY = 'country';
-    const  AREA = 'area';
-    const  LOCATION = 'location';
+    public const  BEGIN_IP = 'begin_ip';
+    public const  END_IP = 'end_ip';
+    public const  COUNTRY = 'country';
+    public const  AREA = 'area';
+    public const  LOCATION = 'location';
     
     /**
      * @var array - 查询结果
@@ -74,7 +74,7 @@ class IP
             return $this;
         }
         $this->ini($path);
-        $ip = pack('N', intval(ip2long($ip)));
+        $ip = pack('N', (int)ip2long($ip));
         //二分查找
         $l = 0;
         $r = $this->total;
@@ -86,19 +86,17 @@ class IP
             $endip = strrev(fread($this->fh, 4)); //中间索引的结束IP地址
             if ($ip < $beginip) { //用户的IP小于中间索引的开始IP地址时
                 $r = $m - 1;
-            } else {
-                if ($ip > $endip) { //用户的IP大于中间索引的结束IP地址时
-                    $l = $m + 1;
-                } else { //用户IP在中间索引的IP范围内时
-                    $findip = $this->first + $m * 7;
-                    break;
-                }
+            } else if ($ip > $endip) { //用户的IP大于中间索引的结束IP地址时
+                $l = $m + 1;
+            } else { //用户IP在中间索引的IP范围内时
+                $findip = $this->first + $m * 7;
+                break;
             }
         }
         //查询国家地区信息
         fseek($this->fh, $findip);
         $location[self::BEGIN_IP] = long2ip($this->getLong4()); //用户IP所在范围的开始地址
-        $offset = $this->getlong3();
+        $offset = $this->getLong3();
         fseek($this->fh, $offset);
         $location[self::END_IP] = long2ip($this->getLong4()); //用户IP所在范围的结束地址
         $byte = fread($this->fh, 1); //标志字节
@@ -198,13 +196,12 @@ class IP
     protected function checkIp(string $ip): bool
     {
         $arr = explode('.', $ip);
-        if (count($arr) != 4) {
+        if (count($arr) !== 4) {
             return false;
-        } else {
-            for ($i = 0; $i < 4; $i++) {
-                if ($arr[$i] < '0' || $arr[$i] > '255') {
-                    return false;
-                }
+        }
+        for ($i = 0; $i < 4; $i++) {
+            if ($arr[$i] < 0 || $arr[$i] > 255) {
+                return false;
             }
         }
         return true;
@@ -218,7 +215,7 @@ class IP
     protected function getInfo(string $data = ''): string
     {
         $char = fread($this->fh, 1);
-        while (ord($char) != 0) { //国家地区信息以0结束
+        while (ord($char) !== 0) { //国家地区信息以0结束
             $data .= $char;
             $char = fread($this->fh, 1);
         }

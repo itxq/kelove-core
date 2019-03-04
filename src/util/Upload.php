@@ -80,9 +80,9 @@ class Upload
      */
     public function getRemoteFile(string $url, string $savePath = '', string $saveName = '', $config = [])
     {
-        $imgUrl = str_replace("&amp;", "&", htmlspecialchars($url));
+        $imgUrl = str_replace('&amp;', '&', htmlspecialchars($url));
         //http开头验证
-        if (strpos($imgUrl, "http") !== 0) {
+        if (strpos($imgUrl, 'http') !== 0) {
             $this->message = '远程图片路径错误';
             return false;
         }
@@ -111,7 +111,7 @@ class Upload
         //获取请求头并检测死链
         $heads = get_headers($imgUrl, 1);
         
-        if (!(stristr($heads[0], '200') && stristr($heads[0], 'OK'))) {
+        if (false !== stripos($heads[0], 200) && false !== stripos($heads[0], 'OK')) {
             $this->message = '远程图片路径错误';
             return false;
         }
@@ -121,7 +121,7 @@ class Upload
         $uploadFileType = get_sub_value('ext', $config, '');
         if (!empty($uploadFileType)) {
             $uploadFileType = explode(',', $uploadFileType);
-            if (!in_array($fileType, $uploadFileType)) {
+            if (!in_array($fileType, $uploadFileType, true)) {
                 $this->message = '文件扩展名错误';
                 return false;
             }
@@ -135,9 +135,9 @@ class Upload
         ob_end_clean();
         $size = strlen($img);
         // ② 验证文件大小
-        $uploadFileSize = intval(get_sub_value('size', $config, 0));
+        $uploadFileSize = (int)get_sub_value('size', $config, 0);
         if ($uploadFileSize > 0) {
-            $uploadFileSize = $uploadFileSize * 1024;
+            $uploadFileSize *= 1024;
             if ($size > $uploadFileSize) {
                 $this->message = '文件大小超出限制';
                 return false;
@@ -160,11 +160,9 @@ class Upload
      */
     public function thumb(string $tempDir, string $saveDir, string $saveName, int $width = 100, int $height = 100): bool
     {
-        if (!is_dir($saveDir)) {
-            if (!mkdir($saveDir, 0700, true)) {
-                $this->message = '创建文件保存目录失败';
-                return false;
-            }
+        if (!is_dir($saveDir) && !mkdir($saveDir, 0755, true, null)) {
+            $this->message = '创建文件保存目录失败';
+            return false;
         }
         $thumb = Image::open($tempDir . $saveName)
             ->thumb($width, $height, Image::THUMB_SCALING)
@@ -188,11 +186,9 @@ class Upload
     private function saveImg(string $content, string $savePath, string $saveName, string $extension): bool
     {
         /* 创建目录 */
-        if (!is_dir($savePath)) {
-            if (!mkdir($savePath, 0700, true)) {
-                $this->message = '创建文件目录失败';
-                return false;
-            }
+        if (!is_dir($savePath) && !mkdir($savePath, 0755, true, null)) {
+            $this->message = '创建文件保存目录失败';
+            return false;
         }
         /* 保存图片 */
         $input = file_put_contents($savePath . $saveName . $extension, $content);

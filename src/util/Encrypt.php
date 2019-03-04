@@ -92,13 +92,14 @@ class Encrypt
         // substr($result, 0, 10) - time() > 0 验证数据有效性
         // substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16) 验证数据完整性
         // 验证数据有效性，请看未加密明文的格式
-        if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) && substr($result, 10,
-                16) == substr(md5(substr($result, 26) . $keys['b']), 0, 16)) {
+        if (
+            (substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0)
+            && substr($result, 10, 16) == substr(md5(substr($result, 26) . $keys['b']), 0, 16)
+        ) {
             $result = substr($result, 26);
             return $result;
-        } else {
-            return '';
         }
+        return '';
     }
     
     /**

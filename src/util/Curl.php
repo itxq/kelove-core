@@ -51,7 +51,7 @@ class Curl
             $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
         }
         $path = $path . '.' . $ext;
-        $fpOutput = fopen($path, 'w');
+        $fpOutput = fopen($path, 'wb');
         $curl = curl_init($url);
         curl_setopt($curl, CURLOPT_FILE, $fpOutput);
         $re = curl_exec($curl);
@@ -59,14 +59,14 @@ class Curl
             $statusCode = 404;
         } else {
             try {
-                $statusCode = intval(curl_getinfo($curl, CURLINFO_HTTP_CODE));
+                $statusCode = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
             } catch (\Exception $exception) {
                 $statusCode = 404;
             }
         }
         curl_close($curl);
         $path = realpath($path);
-        if ($statusCode == 200 || $statusCode == 304) {    // 状态值正常表示下载成功
+        if ($statusCode === 200 || $statusCode === 304) {    // 状态值正常表示下载成功
             return $path;
         }
         if ($path) { //下载失败删除临时文件

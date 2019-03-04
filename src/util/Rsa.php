@@ -31,9 +31,9 @@ class Rsa
      */
     public function sign(string $data, string $privateKey): string
     {
-        $privateKey = $this->getPrivateKey($privateKey);
-        openssl_sign($data, $sign, $privateKey);
-        openssl_free_key($privateKey);
+        $privateKeyObj = $this->getPrivateKey($privateKey);
+        openssl_sign($data, $sign, $privateKeyObj);
+        openssl_free_key($privateKeyObj);
         return base64_encode($sign);
     }
     
@@ -46,9 +46,9 @@ class Rsa
      */
     public function checkSign(string $data, string $sign, string $publicKey): bool
     {
-        $publicKey = $this->getPublicKey($publicKey);
+        $publicKeyObj = $this->getPublicKey($publicKey);
         $sign = base64_decode($sign);
-        return (bool)openssl_verify($data, $sign, $publicKey);
+        return (bool)openssl_verify($data, $sign, $publicKeyObj);
     }
     
     /**
@@ -59,11 +59,11 @@ class Rsa
      */
     public function encrypt(string $data, string $publicKey): string
     {
-        $data = str_split($data, 117);
+        $dataArray = str_split($data, 117);
         $key = $this->getPublicKey($publicKey);
         $encrypt = '';
-        foreach ($data as $v) {
-            openssl_public_encrypt($v, $encryptedTemp, $key);
+        foreach ($dataArray as $v) {
+            openssl_public_encrypt($v, $encryptedTemp, $key, OPENSSL_PKCS1_OAEP_PADDING);
             $encrypt .= $encryptedTemp;
         }
         return base64_encode($encrypt);
@@ -82,19 +82,22 @@ class Rsa
         // 获得私钥
         $key = $this->getPrivateKey($privateKey);
         // 拆分数据
-        $data = str_split($data, 256);
+        $dataArray = str_split($data, 256);
         $decrypted = '';
-        foreach ($data as $v) {
-            openssl_private_decrypt($v, $decryptedTemp, $key);
+        foreach ($dataArray as $v) {
+            openssl_private_decrypt($v, $decryptedTemp, $key, OPENSSL_PKCS1_OAEP_PADDING);
             $decrypted .= $decryptedTemp;
         }
         return $decrypted;
     }
     
+    
     /**
      * 获取私钥
+     * @author IT小强
+     * @createTime 2019-03-04 12:20:34
      * @param string $privateKey - 私钥文件路径/私钥字符串
-     * @return bool|resource|string
+     * @return false|resource
      */
     protected function getPrivateKey(string $privateKey)
     {
@@ -105,16 +108,18 @@ class Rsa
         } else {
             $key = "-----BEGIN RSA PRIVATE KEY-----\n";
             $key .= $privateKey . "\n";
-            $key .= "-----END RSA PRIVATE KEY-----";
+            $key .= '-----END RSA PRIVATE KEY-----';
         }
         $key = openssl_pkey_get_private($key);
         return $key;
     }
     
     /**
-     * 获取公钥
+     * @title 获取公钥
+     * @author IT小强
+     * @createTime 2019-03-04 12:19:31
      * @param string $publicKey - 公钥文件路径/公钥字符串
-     * @return bool|resource|string
+     * @return false|resource
      */
     protected function getPublicKey(string $publicKey)
     {
@@ -125,7 +130,7 @@ class Rsa
         } else {
             $key = "-----BEGIN PUBLIC KEY-----\n";
             $key .= $publicKey . "\n";
-            $key .= "-----END PUBLIC KEY-----";
+            $key .= '-----END PUBLIC KEY-----';
         }
         $key = openssl_pkey_get_public($key);
         return $key;
